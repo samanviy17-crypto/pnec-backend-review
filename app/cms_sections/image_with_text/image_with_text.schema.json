@@ -1,0 +1,51 @@
+{
+  "type": "image_with_text",
+  "label": "Image with text",
+  "category": "content",
+  "description": "Image on one side, heading + text + CTA on the other. Image position is configurable.",
+  "settings": [
+    { "id": "image_url",      "type": "image",    "label": "Image" },
+    { "id": "image_alt",      "type": "text",     "label": "Image alt text", "default": "" },
+    { "id": "heading",        "type": "text",     "label": "Heading",       "default": "About PNEC" },
+    { "id": "body",           "type": "richtext", "label": "Body",          "default": "PNEC is a community-based emergency preparedness organization serving the neighborhoods of Poway, CA." },
+    { "id": "cta_label",      "type": "text",     "label": "Button label",  "default": "Learn more" },
+    { "id": "cta_url",        "type": "url",      "label": "Button link",   "default": "#" },
+    { "id": "image_position", "type": "select",   "label": "Image position",
+      "options": ["left", "right"], "default": "left" }
+  ],
+  "presets": [
+    {
+      "name": "About PNEC (image left)",
+      "settings": {
+        "heading": "Founded in 2003 by Poway neighbors.",
+        "body": "<p>PNEC was started after the 2003 Cedar Fire by residents who realized the only people on their block during an emergency would be each other. Today we connect 3,200+ households across 14 neighborhoods.</p><p>Every coordinator, instructor, and board member is a volunteer.</p>",
+        "image_alt": "Group photo of PNEC volunteers at a community event",
+        "cta_label": "Read our story",
+        "cta_url": "/pages/about.html",
+        "image_position": "left"
+      }
+    },
+    {
+      "name": "Why prepare (image right)",
+      "settings": {
+        "heading": "Three days. That's the gap.",
+        "body": "<p>FEMA and Cal OES recommend every household keep 72 hours of supplies — food, water, medications, cash. After a major event, that's how long it can take help to reach you.</p><p>One in three Poway households loses power, water, or shelter for some part of the year. PNEC closes the gap.</p>",
+        "image_alt": "Family checking emergency kit supplies",
+        "cta_label": "Build your kit",
+        "cta_url": "/pages/preparedness-resources.html",
+        "image_position": "right"
+      }
+    },
+    {
+      "name": "Volunteer call (image left)",
+      "settings": {
+        "heading": "Join 100+ block volunteers.",
+        "body": "<p>Block coordinators check in on their neighbors during outages, share preparedness tips at meetings, and help keep the household roster current. About 4 hours a year.</p><p>No prior emergency experience needed — we train you.</p>",
+        "image_alt": "Block coordinator chatting with neighbors on a porch",
+        "cta_label": "Volunteer",
+        "cta_url": "/pages/volunteer.html",
+        "image_position": "left"
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "type": "hero",
+  "label": "Hero",
+  "category": "headers",
+  "description": "A large headline + sub-headline + image with an optional call-to-action.",
+  "settings": [
+    { "id": "headline",       "type": "text",   "label": "Headline",       "default": "Neighbors Helping Neighbors" },
+    { "id": "sub_headline",   "type": "text",   "label": "Sub-headline",   "default": "Poway Neighborhood Emergency Corps" },
+    { "id": "image_url",      "type": "image",  "label": "Background image" },
+    { "id": "cta_label",      "type": "text",   "label": "Button label",   "default": "Learn more" },
+    { "id": "cta_url",        "type": "url",    "label": "Button link",    "default": "#" },
+    { "id": "text_alignment", "type": "select", "label": "Text alignment",
+      "options": ["left", "center", "right"], "default": "center" }
+  ],
+  "presets": [
+    {
+      "name": "Mission hero",
+      "settings": {
+        "headline": "Neighbors helping neighbors prepare.",
+        "sub_headline": "Poway Neighborhood Emergency Corps · 100% volunteer-run since 2003.",
+        "cta_label": "Find your block",
+        "cta_url": "/pages/find-your-neighborhood.html",
+        "text_alignment": "center"
+      }
+    },
+    {
+      "name": "Donate / support",
+      "settings": {
+        "headline": "Keep PNEC ready.",
+        "sub_headline": "Your donation funds drills, kits, and outreach across all 14 Poway neighborhoods.",
+        "cta_label": "Donate now",
+        "cta_url": "/donation-form/",
+        "text_alignment": "center"
+      }
+    },
+    {
+      "name": "Event spotlight",
+      "settings": {
+        "headline": "11th Annual Emergency &amp; Safety Fair",
+        "sub_headline": "Saturday May 31, 2025 · 10am–2pm · Aubrey Park, Poway",
+        "cta_label": "RSVP",
+        "cta_url": "/pages/community-events-and-activities.html",
+        "text_alignment": "left"
+      }
+    }
+  ]
+}

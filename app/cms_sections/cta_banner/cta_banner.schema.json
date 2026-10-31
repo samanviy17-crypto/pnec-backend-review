@@ -1,0 +1,38 @@
+{
+  "type": "cta_banner",
+  "label": "Call-to-Action Banner",
+  "category": "headers",
+  "description": "A bold full-width banner with a heading + button. Great for donations or volunteer signups.",
+  "settings": [
+    { "id": "heading",        "type": "text",   "label": "Heading", "default": "Help your neighbors prepare." },
+    { "id": "sub_heading",    "type": "text",   "label": "Sub-heading", "default": "Volunteer with PNEC today." },
+    { "id": "cta_label",      "type": "text",   "label": "Button label", "default": "Get involved" },
+    { "id": "cta_url",        "type": "url",    "label": "Button link", "default": "#" },
+    { "id": "background",     "type": "select", "label": "Background", "options": ["primary", "accent", "alert_red", "alert_amber"], "default": "primary" },
+    { "id": "text_alignment", "type": "select", "label": "Text alignment", "options": ["left", "center", "right"], "default": "center" }
+  ],
+  "presets": [
+    {
+      "name": "Volunteer Signup",
+      "settings": {
+        "heading": "Volunteer with PNEC",
+        "sub_heading": "Help your neighbors prepare for emergencies.",
+        "cta_label": "Email contact@example.test",
+        "cta_url": "mailto:contact@example.test",
+        "background": "primary",
+        "text_alignment": "center"
+      }
+    },
+    {
+      "name": "Donation CTA",
+      "settings": {
+        "heading": "Support PNEC",
+        "sub_heading": "We're a 501(c)(3) — every dollar funds Block Parties, training, and outreach.",
+        "cta_label": "Donate",
+        "cta_url": "#donate",
+        "background": "accent",
+        "text_alignment": "center"
+      }
+    }
+  ]
+}

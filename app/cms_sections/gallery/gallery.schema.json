@@ -1,0 +1,42 @@
+{
+  "type": "gallery",
+  "label": "Image Gallery",
+  "category": "media",
+  "description": "A responsive grid of images. Good for event photos, training sessions, or program highlights.",
+  "settings": [
+    { "id": "heading", "type": "text", "label": "Heading", "default": "Gallery" },
+    { "id": "columns", "type": "select", "label": "Columns", "options": ["2", "3", "4"], "default": "3" }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "label": "Image",
+      "settings": [
+        { "id": "image_url", "type": "image", "label": "Image" },
+        { "id": "caption",   "type": "text",  "label": "Caption" },
+        { "id": "alt",       "type": "text",  "label": "Alt text" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Event photos (3-up)",
+      "settings": { "heading": "From the field", "columns": "3" },
+      "blocks": [
+        { "type": "image", "settings": { "caption": "Annual Safety Fair", "alt": "Volunteers staffing the PNEC tent at the Annual Emergency & Safety Fair" } },
+        { "type": "image", "settings": { "caption": "Block training", "alt": "PNEC training session in a community room" } },
+        { "type": "image", "settings": { "caption": "Drills in action", "alt": "Block coordinators practicing an evacuation drill" } }
+      ]
+    },
+    {
+      "name": "Coordinator headshots (4-up)",
+      "settings": { "heading": "Meet your block coordinators", "columns": "4" },
+      "blocks": [
+        { "type": "image", "settings": { "caption": "Coordinator name", "alt": "Headshot of coordinator" } },
+        { "type": "image", "settings": { "caption": "Coordinator name", "alt": "Headshot of coordinator" } },
+        { "type": "image", "settings": { "caption": "Coordinator name", "alt": "Headshot of coordinator" } },
+        { "type": "image", "settings": { "caption": "Coordinator name", "alt": "Headshot of coordinator" } }
+      ]
+    }
+  ]
+}

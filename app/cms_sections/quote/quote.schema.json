@@ -1,0 +1,38 @@
+{
+  "type": "quote",
+  "label": "Quote / Testimonial",
+  "category": "content",
+  "description": "A featured quote or testimonial from a community member or partner.",
+  "settings": [
+    { "id": "quote",     "type": "richtext", "label": "Quote", "default": "Knowing my neighbors made all the difference during the wildfire." },
+    { "id": "attribution", "type": "text", "label": "Attribution", "default": "Sarah, Poway resident" },
+    { "id": "image_url", "type": "image", "label": "Photo (optional)" },
+    { "id": "alignment", "type": "select", "label": "Alignment", "options": ["left", "center"], "default": "center" }
+  ],
+  "presets": [
+    {
+      "name": "Resident testimonial (centered)",
+      "settings": {
+        "quote": "<p>When the grid went out last summer, my block coordinator had medication delivered within an hour. We'd never met before that. Now they feel like family.</p>",
+        "attribution": "Mary R. · Rancho Arbolitos resident",
+        "alignment": "center"
+      }
+    },
+    {
+      "name": "Partner endorsement (left)",
+      "settings": {
+        "quote": "<p>PNEC is the gold standard for grassroots community preparedness in San Diego County. Their block-coordinator network is the model we point other cities to.</p>",
+        "attribution": "Poway Fire Department",
+        "alignment": "left"
+      }
+    },
+    {
+      "name": "Volunteer story (centered)",
+      "settings": {
+        "quote": "<p>I signed up to help one weekend a year. Five years later, I know every household on my block by name. It's the most meaningful thing I do in this town.</p>",
+        "attribution": "James T. · Block coordinator since 2020",
+        "alignment": "center"
+      }
+    }
+  ]
+}

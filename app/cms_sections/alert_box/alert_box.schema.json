@@ -1,0 +1,35 @@
+{
+  "type": "alert_box",
+  "label": "Alert Box",
+  "category": "headers",
+  "description": "A colored alert/notice. Use for evacuation warnings, red-flag days, or important announcements.",
+  "settings": [
+    { "id": "level",   "type": "select", "label": "Severity", "options": ["red", "amber", "green", "info"], "default": "amber" },
+    { "id": "icon",    "type": "text",   "label": "Icon (emoji)", "default": "⚠" },
+    { "id": "message", "type": "richtext", "label": "Message", "default": "Stay alert. Follow Poway Fire Dept guidance." },
+    { "id": "cta_label", "type": "text", "label": "Button label" },
+    { "id": "cta_url",   "type": "url",  "label": "Button link" }
+  ],
+  "presets": [
+    {
+      "name": "Wildfire Red Flag",
+      "settings": {
+        "level": "red",
+        "icon": "🔥",
+        "message": "<strong>RED FLAG WARNING.</strong> Critical fire weather conditions in effect. Evacuation may be ordered with little notice — review your go-bag and family plan now.",
+        "cta_label": "Read evac guide",
+        "cta_url": "/pages/preparedness-resources.html"
+      }
+    },
+    {
+      "name": "Event Announcement",
+      "settings": {
+        "level": "info",
+        "icon": "📅",
+        "message": "<strong>Upcoming event:</strong> 11th Annual Emergency &amp; Safety Fair, May 31, 2025, 10am–2pm at Aubrey Park.",
+        "cta_label": "RSVP",
+        "cta_url": "/pages/community-events-and-activities.html"
+      }
+    }
+  ]
+}

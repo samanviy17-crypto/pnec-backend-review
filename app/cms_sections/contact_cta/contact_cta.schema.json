@@ -1,0 +1,41 @@
+{
+  "type": "contact_cta",
+  "label": "Contact CTA",
+  "category": "content",
+  "description": "An email + phone block with optional message. Good for the bottom of any page.",
+  "settings": [
+    { "id": "heading",   "type": "text", "label": "Heading", "default": "Get in touch" },
+    { "id": "intro",     "type": "richtext", "label": "Intro text", "default": "Reach out if you'd like to volunteer, host a Block Party, or join a training." },
+    { "id": "email",     "type": "text", "label": "Email", "default": "contact@example.test" },
+    { "id": "phone",     "type": "text", "label": "Phone", "default": "" },
+    { "id": "address",   "type": "text", "label": "Address", "default": "Poway, CA" }
+  ],
+  "presets": [
+    {
+      "name": "General contact",
+      "settings": {
+        "heading": "Get in touch",
+        "intro": "<p>Have a question about PNEC programs, want to volunteer, or need help finding your block coordinator? Reach out — a real person reads every message.</p>",
+        "email": "contact@example.test",
+        "address": "Poway, CA"
+      }
+    },
+    {
+      "name": "Volunteer interest",
+      "settings": {
+        "heading": "Want to volunteer?",
+        "intro": "<p>PNEC is 100% volunteer-run. Block coordinators, event helpers, training instructors, web admins — there's a role that fits how much time you can give.</p>",
+        "email": "contact@example.test"
+      }
+    },
+    {
+      "name": "Press / partnerships",
+      "settings": {
+        "heading": "For media &amp; partners",
+        "intro": "<p>If you're with a city agency, a fire district, a local nonprofit, or a news outlet, please reach out and we'll get back to you within one business day.</p>",
+        "email": "contact@example.test",
+        "address": "Poway, CA 92064"
+      }
+    }
+  ]
+}

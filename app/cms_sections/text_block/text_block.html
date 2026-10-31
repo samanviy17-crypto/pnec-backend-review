@@ -1,0 +1,5 @@
+{% comment %} CMS section: Text block — stega-tagged for inline editing {% endcomment %}
+<section class="cms-text-block" style="padding: 32px 24px; max-width: 880px; margin: 0 auto; text-align: {{ settings.text_alignment | default: 'left' }};">
+  {% if settings.heading %}<h2 class="cms-text-block__heading" style="margin: 0 0 12px; font-size: 1.6rem;">{{ settings.heading | cms_stega: 'heading', section.id }}</h2>{% endif %}
+  {% if settings.body %}<div class="cms-text-block__body" style="font-size: 1rem; line-height: 1.55;">{{ settings.body }}</div>{% endif %}
+</section>

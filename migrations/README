@@ -1,0 +1,24 @@
+PNEC versioned additive baseline: 0001_pnec_release (28 release tables).
+
+PROPOSED FOR MAINTAINER/OPERATOR REVIEW. Run only on disposable databases until
+schema inspection, backup/restore rehearsal and operator approval are complete.
+Production worker startup performs no initialization; development retains its
+existing create_all/legacy compatibility behavior.
+
+The frozen baseline preflights existing release tables before DDL. It creates
+missing release tables and adds only four recognized nullable legacy users
+columns (bio, avatar_url, phone, auth_token), including the new token index.
+Unexpected columns/types/nullability/constraints require a separate reviewed
+migration. Extra tables/columns are preserved, not removed. Do not blindly stamp.
+
+Run once, with worker traffic stopped and correct operator-managed environment:
+  python -m flask --app main db upgrade
+  python -m flask --app main release-seed --approved
+
+Never use db_init.py, drop_all, db downgrade, or an older environment by accident.
+A downgrade deliberately refuses to drop tables or columns. Roll back the app
+image against the additive schema after compatibility checks. Restoring a backup
+is a separately approved data-recovery operation with potential loss of later
+writes. MySQL and SQLite DDL are not assumed transactional; inspect partial
+failures and rehearse on a sanitized clone. See deploy/RELEASE_RUNBOOK.md and
+DATABASE_RECOVERY.md for prerequisites and operator gates.

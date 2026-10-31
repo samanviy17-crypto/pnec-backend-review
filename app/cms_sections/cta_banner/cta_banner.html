@@ -1,0 +1,10 @@
+{% comment %} CMS section: CTA banner — stega-tagged {% endcomment %}
+<section class="cms-cta" style="padding: 48px 24px; text-align: {{ settings.text_alignment | default: 'center' }};
+  background: var(--cms-color-{{ settings.background | default: 'primary' | replace: '_', '-' }}, #1e3a8a);
+  color: var(--cms-color-{{ settings.background | default: 'primary' | replace: '_', '-' }}-text, #ffffff);">
+  {% if settings.heading %}<h2 class="cms-cta__heading" style="margin: 0 0 8px; font-size: 1.8rem; font-weight: 700;">{{ settings.heading | cms_stega: 'heading', section.id }}</h2>{% endif %}
+  {% if settings.sub_heading %}<p class="cms-cta__sub" style="margin: 0 0 18px; font-size: 1.05rem; opacity: .9;">{{ settings.sub_heading | cms_stega: 'sub_heading', section.id }}</p>{% endif %}
+  {% if settings.cta_label and settings.cta_url %}
+    <a class="cms-cta__btn" href="{{ settings.cta_url }}" style="display: inline-block; padding: 12px 28px; background: white; color: #1e3a8a; border-radius: 6px; text-decoration: none; font-weight: 700;">{{ settings.cta_label | cms_stega: 'cta_label', section.id }}</a>
+  {% endif %}
+</section>

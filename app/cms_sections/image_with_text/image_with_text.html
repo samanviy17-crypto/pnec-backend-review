@@ -1,0 +1,15 @@
+{% comment %} CMS section: Image with text — stega-tagged {% endcomment %}
+<section class="cms-iwt" style="padding: 32px 24px; max-width: 1080px; margin: 0 auto; display: grid; gap: 24px;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;">
+  <div class="cms-iwt__media" style="order: {% if settings.image_position == 'right' %}2{% else %}1{% endif %};">
+    {% if settings.image_url %}<img src="{{ settings.image_url }}" alt="{{ settings.image_alt | default: '' }}" style="width: 100%; height: auto; border-radius: 8px;" />{% endif %}
+  </div>
+  <div class="cms-iwt__text" style="order: {% if settings.image_position == 'right' %}1{% else %}2{% endif %};">
+    {% if settings.heading %}<h2 style="margin: 0 0 12px; font-size: 1.5rem;">{{ settings.heading | cms_stega: 'heading', section.id }}</h2>{% endif %}
+    {% if settings.body %}<div style="font-size: 1rem; line-height: 1.55; margin-bottom: 16px;">{{ settings.body }}</div>{% endif %}
+    {% if settings.cta_label and settings.cta_url %}
+    <a href="{{ settings.cta_url }}" style="display: inline-block; padding: 8px 18px; background: var(--cms-color-primary, #1e3a8a); color: white; border-radius: 6px; text-decoration: none; font-weight: 600;">{{ settings.cta_label | cms_stega: 'cta_label', section.id }}</a>
+    {% endif %}
+  </div>
+</section>

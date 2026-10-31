@@ -1,0 +1,4 @@
+{% comment %} CMS section: Custom HTML — escape hatch {% endcomment %}
+<div class="cms-custom-html {{ settings.wrapper_class | default: '' }}">
+  {{ settings.html | default: '' }}
+</div>

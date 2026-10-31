@@ -1,0 +1,10 @@
+{% comment %} CMS section: Hero — text fields stega-tagged for inline editing {% endcomment %}
+<section class="cms-hero" style="text-align: {{ settings.text_alignment | default: 'center' }};
+  {% if settings.image_url %}background-image: url('{{ settings.image_url }}'); background-size: cover; background-position: center;{% endif %}
+  padding: 64px 24px; min-height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-shadow: 0 2px 8px rgba(0,0,0,.5);">
+  {% if settings.headline %}<h1 class="cms-hero__headline" style="margin: 0 0 12px; font-size: 2.4rem; font-weight: 800;">{{ settings.headline | cms_stega: 'headline', section.id }}</h1>{% endif %}
+  {% if settings.sub_headline %}<p class="cms-hero__sub" style="margin: 0 0 20px; font-size: 1.1rem; max-width: 720px;">{{ settings.sub_headline | cms_stega: 'sub_headline', section.id }}</p>{% endif %}
+  {% if settings.cta_label and settings.cta_url %}
+  <a class="cms-hero__cta" href="{{ settings.cta_url }}" style="display: inline-block; padding: 10px 22px; background: #1e3a8a; color: white; border-radius: 6px; text-decoration: none; font-weight: 600;">{{ settings.cta_label | cms_stega: 'cta_label', section.id }}</a>
+  {% endif %}
+</section>

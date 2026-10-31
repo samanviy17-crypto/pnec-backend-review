@@ -1,0 +1,20 @@
+{% comment %} CMS section: Two-column — stega-tagged headings {% endcomment %}
+<section class="cms-two-col" style="padding: 32px 24px; max-width: var(--cms-max-width-content, 1080px); margin: 0 auto;">
+  {% if settings.heading %}<h2 style="margin: 0 0 22px; font-size: 1.5rem; text-align: center;">{{ settings.heading | cms_stega: 'heading', section.id }}</h2>{% endif %}
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    <div>
+      {% if settings.left_heading %}<h3 style="margin: 0 0 8px; font-size: 1.1rem;">{{ settings.left_heading | cms_stega: 'left_heading', section.id }}</h3>{% endif %}
+      {% if settings.left_body %}<div style="color: #475569; line-height: 1.55;">{{ settings.left_body }}</div>{% endif %}
+    </div>
+    <div>
+      {% if settings.right_heading %}<h3 style="margin: 0 0 8px; font-size: 1.1rem;">{{ settings.right_heading | cms_stega: 'right_heading', section.id }}</h3>{% endif %}
+      {% if settings.right_body %}<div style="color: #475569; line-height: 1.55;">{{ settings.right_body }}</div>{% endif %}
+    </div>
+  </div>
+</section>
+<style>
+  @media (max-width: 640px) {
+    .cms-two-col > div:last-child { grid-template-columns: 1fr !important; }
+    .cms-two-col > div { grid-template-columns: 1fr !important; }
+  }
+</style>

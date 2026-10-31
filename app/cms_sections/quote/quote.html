@@ -1,0 +1,6 @@
+{% comment %} CMS section: Quote — stega-tagged on attribution {% endcomment %}
+<section class="cms-quote" style="padding: 40px 24px; max-width: 720px; margin: 0 auto; text-align: {{ settings.alignment | default: 'center' }};">
+  {% if settings.image_url %}<img src="{{ settings.image_url }}" alt="" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 14px; display: block;" />{% endif %}
+  {% if settings.quote %}<blockquote style="margin: 0 0 12px; font-size: 1.25rem; font-style: italic; color: #1e293b; line-height: 1.5;">"{{ settings.quote | strip_html }}"</blockquote>{% endif %}
+  {% if settings.attribution %}<div style="font-size: .95rem; color: #64748b;">— {{ settings.attribution | cms_stega: 'attribution', section.id }}</div>{% endif %}
+</section>

@@ -1,0 +1,45 @@
+{
+  "type": "two_column",
+  "label": "Two Columns",
+  "category": "layout",
+  "description": "Two side-by-side text columns. Good for comparison content or grouping related information.",
+  "settings": [
+    { "id": "heading", "type": "text", "label": "Section heading" },
+    { "id": "left_heading", "type": "text", "label": "Left column heading", "default": "Left column" },
+    { "id": "left_body",    "type": "richtext", "label": "Left column body", "default": "Add your content here." },
+    { "id": "right_heading", "type": "text", "label": "Right column heading", "default": "Right column" },
+    { "id": "right_body",    "type": "richtext", "label": "Right column body", "default": "Add your content here." }
+  ],
+  "presets": [
+    {
+      "name": "Before / After preparedness",
+      "settings": {
+        "heading": "Why prepare now",
+        "left_heading": "Without a plan",
+        "left_body": "<ul><li>Phones are jammed in the first hour</li><li>Stores are sold out within 90 minutes</li><li>You're driving to find shelter at the worst possible time</li><li>You don't know which neighbors need help</li></ul>",
+        "right_heading": "With PNEC",
+        "right_body": "<ul><li>72 hours of supplies already in the closet</li><li>Block coordinator already has your roster</li><li>Pre-planned evacuation route from your address</li><li>Neighbors who know each other and check in</li></ul>"
+      }
+    },
+    {
+      "name": "What we do / What we don't",
+      "settings": {
+        "heading": "PNEC scope",
+        "left_heading": "What we do",
+        "left_body": "<ul><li>Train block coordinators</li><li>Run drills and the annual Safety Fair</li><li>Maintain household rosters per block</li><li>Publish preparedness guides specific to Poway terrain</li></ul>",
+        "right_heading": "What we don't",
+        "right_body": "<ul><li>We're not first responders — call 911</li><li>We don't operate shelters during evacuation</li><li>We don't replace your home insurance</li><li>We don't provide medical care</li></ul>"
+      }
+    },
+    {
+      "name": "Membership tiers",
+      "settings": {
+        "heading": "Two ways to participate",
+        "left_heading": "Resident",
+        "left_body": "<p>Free. Connects you to your block coordinator and gives you access to drills, guides, and the member newsletter.</p>",
+        "right_heading": "Volunteer",
+        "right_body": "<p>Free. Joins you to a coordinator team or event-helper pool. ~4 hours per year. Training provided.</p>"
+      }
+    }
+  ]
+}

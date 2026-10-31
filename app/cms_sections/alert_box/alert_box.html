@@ -1,0 +1,17 @@
+{% comment %} CMS section: Alert box — stega-tagged on cta_label {% endcomment %}
+{% case settings.level %}
+  {% when 'red' %}{% assign bg = '#fee2e2' %}{% assign fg = '#991b1b' %}{% assign border = '#dc2626' %}
+  {% when 'amber' %}{% assign bg = '#fef3c7' %}{% assign fg = '#92400e' %}{% assign border = '#f59e0b' %}
+  {% when 'green' %}{% assign bg = '#dcfce7' %}{% assign fg = '#14532d' %}{% assign border = '#10b981' %}
+  {% else %}{% assign bg = '#dbeafe' %}{% assign fg = '#1e3a8a' %}{% assign border = '#3b82f6' %}
+{% endcase %}
+<section class="cms-alert" style="padding: 16px 20px; max-width: var(--cms-max-width-content, 1080px); margin: 16px auto;
+  background: {{ bg }}; color: {{ fg }}; border-left: 6px solid {{ border }}; border-radius: var(--cms-radius-md, 6px); display: flex; gap: 14px; align-items: flex-start;">
+  <span style="font-size: 1.5rem; line-height: 1;">{{ settings.icon | default: '⚠' }}</span>
+  <div style="flex: 1;">
+    {% if settings.message %}<div style="font-size: 1rem; line-height: 1.5;">{{ settings.message }}</div>{% endif %}
+    {% if settings.cta_label and settings.cta_url %}
+      <a href="{{ settings.cta_url }}" style="display: inline-block; margin-top: 8px; padding: 6px 14px; background: {{ border }}; color: white; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: .9rem;">{{ settings.cta_label | cms_stega: 'cta_label', section.id }}</a>
+    {% endif %}
+  </div>
+</section>

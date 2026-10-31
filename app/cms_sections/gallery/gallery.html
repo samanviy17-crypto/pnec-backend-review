@@ -1,0 +1,19 @@
+{% comment %} CMS section: Gallery — stega-tagged heading + block captions {% endcomment %}
+<section class="cms-gallery" style="padding: 32px 24px; max-width: var(--cms-max-width-content, 1080px); margin: 0 auto;">
+  {% if settings.heading %}<h2 class="cms-gallery__heading" style="margin: 0 0 18px; font-size: 1.5rem; text-align: center;">{{ settings.heading | cms_stega: 'heading', section.id }}</h2>{% endif %}
+  <div class="cms-gallery__grid" style="display: grid; grid-template-columns: repeat({{ settings.columns | default: 3 }}, 1fr); gap: 12px;">
+    {% for block in blocks %}
+      <figure class="cms-gallery__item" data-cms-block-id="{{ block.id }}" style="margin: 0; border-radius: var(--cms-radius-md, 6px); overflow: hidden; background: #f1f5f9;">
+        {% if block.settings.image_url %}<img src="{{ block.settings.image_url }}" alt="{{ block.settings.alt | default: '' }}" style="width: 100%; height: 220px; object-fit: cover; display: block;" />{% endif %}
+        {% if block.settings.caption %}<figcaption style="padding: 8px 10px; font-size: .85rem; color: #475569;">{{ block.settings.caption }}</figcaption>{% endif %}
+      </figure>
+    {% endfor %}
+    {% if blocks.size == 0 %}
+      <p style="grid-column: 1 / -1; text-align: center; padding: 24px; color: #94a3b8;">No images yet — add some from the editor.</p>
+    {% endif %}
+  </div>
+</section>
+<style>
+  @media (max-width: 720px) { .cms-gallery__grid { grid-template-columns: repeat(2, 1fr) !important; } }
+  @media (max-width: 480px) { .cms-gallery__grid { grid-template-columns: 1fr !important; } }
+</style>

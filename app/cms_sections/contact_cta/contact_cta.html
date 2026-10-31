@@ -1,0 +1,10 @@
+{% comment %} CMS section: Contact CTA — stega-tagged heading + address {% endcomment %}
+<section class="cms-contact" style="padding: 32px 24px; max-width: 720px; margin: 0 auto; text-align: center;">
+  {% if settings.heading %}<h2 style="margin: 0 0 8px; font-size: 1.5rem;">{{ settings.heading | cms_stega: 'heading', section.id }}</h2>{% endif %}
+  {% if settings.intro %}<div style="color: #475569; line-height: 1.55; margin-bottom: 18px;">{{ settings.intro }}</div>{% endif %}
+  <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+    {% if settings.email %}<a href="mailto:{{ settings.email }}" style="padding: 8px 16px; background: var(--cms-color-primary, #1e3a8a); color: white; border-radius: 6px; text-decoration: none; font-weight: 600;">✉ {{ settings.email }}</a>{% endif %}
+    {% if settings.phone %}<a href="tel:{{ settings.phone }}" style="padding: 8px 16px; background: white; color: var(--cms-color-primary, #1e3a8a); border: 1px solid var(--cms-color-primary, #1e3a8a); border-radius: 6px; text-decoration: none; font-weight: 600;">☎ {{ settings.phone }}</a>{% endif %}
+  </div>
+  {% if settings.address %}<p style="margin-top: 14px; color: #94a3b8; font-size: .9rem;">{{ settings.address | cms_stega: 'address', section.id }}</p>{% endif %}
+</section>

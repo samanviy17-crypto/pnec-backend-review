@@ -1,0 +1,32 @@
+{
+  "type": "faq",
+  "label": "FAQ",
+  "category": "content",
+  "description": "A list of question / answer pairs. Add as many items as you need.",
+  "settings": [
+    { "id": "heading",        "type": "text",   "label": "Heading", "default": "Frequently asked questions" },
+    { "id": "text_alignment", "type": "select", "label": "Heading alignment",
+      "options": ["left", "center", "right"], "default": "center" }
+  ],
+  "blocks": [
+    {
+      "type": "qa",
+      "label": "Question",
+      "settings": [
+        { "id": "question", "type": "text",     "label": "Question", "default": "Your question?" },
+        { "id": "answer",   "type": "richtext", "label": "Answer",   "default": "Your answer." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ — 3 questions",
+      "settings": { "heading": "Frequently asked questions" },
+      "blocks": [
+        { "type": "qa", "settings": { "question": "How do I prepare for wildfires?", "answer": "Make a go-bag, sign up for alerts, and clear defensible space." } },
+        { "type": "qa", "settings": { "question": "Where do I evacuate?",            "answer": "Follow the routes posted by Poway Fire Dept on the day of." } },
+        { "type": "qa", "settings": { "question": "How do I become a volunteer?",    "answer": "Email contact@example.test." } }
+      ]
+    }
+  ]
+}

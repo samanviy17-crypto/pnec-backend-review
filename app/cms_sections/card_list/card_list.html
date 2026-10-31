@@ -1,0 +1,24 @@
+{% comment %} CMS section: Card list — stega-tagged heading {% endcomment %}
+<section class="cms-cards" style="padding: 32px 24px; max-width: var(--cms-max-width-content, 1080px); margin: 0 auto;">
+  {% if settings.heading %}<h2 class="cms-cards__heading" style="margin: 0 0 8px; font-size: 1.6rem; text-align: center;">{{ settings.heading | cms_stega: 'heading', section.id }}</h2>{% endif %}
+  {% if settings.description %}<div class="cms-cards__intro" style="text-align: center; max-width: 720px; margin: 0 auto 22px; color: #475569;">{{ settings.description }}</div>{% endif %}
+  <div class="cms-cards__grid" style="display: grid; grid-template-columns: repeat({{ settings.columns | default: 3 }}, 1fr); gap: 18px;">
+    {% for block in blocks %}
+      <div class="cms-cards__card" data-cms-block-id="{{ block.id }}" style="background: white; border: 1px solid #e2e8f0; border-radius: var(--cms-radius-lg, 12px); padding: 18px; display: flex; flex-direction: column; gap: 8px;">
+        {% if block.settings.image_url %}<img src="{{ block.settings.image_url }}" alt="" style="width: 100%; height: 160px; object-fit: cover; border-radius: var(--cms-radius-md, 6px);" />
+        {% elsif block.settings.icon %}<div style="font-size: 1.8rem;">{{ block.settings.icon }}</div>{% endif %}
+        {% if block.settings.heading %}<h3 style="margin: 0; font-size: 1.1rem;">{{ block.settings.heading }}</h3>{% endif %}
+        {% if block.settings.body %}<div style="color: #475569; font-size: .95rem; line-height: 1.5;">{{ block.settings.body }}</div>{% endif %}
+        {% if block.settings.cta_label and block.settings.cta_url %}
+          <a href="{{ block.settings.cta_url }}" style="margin-top: auto; align-self: flex-start; padding: 6px 14px; background: var(--cms-color-primary, #1e3a8a); color: white; border-radius: 6px; text-decoration: none; font-size: .9rem; font-weight: 600;">{{ block.settings.cta_label }}</a>
+        {% endif %}
+      </div>
+    {% endfor %}
+    {% if blocks.size == 0 %}
+      <p style="grid-column: 1 / -1; text-align: center; color: #94a3b8;">No cards yet — add some from the editor.</p>
+    {% endif %}
+  </div>
+</section>
+<style>
+  @media (max-width: 720px) { .cms-cards__grid { grid-template-columns: 1fr !important; } }
+</style>

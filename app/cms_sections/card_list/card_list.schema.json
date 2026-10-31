@@ -1,0 +1,52 @@
+{
+  "type": "card_list",
+  "label": "Card List",
+  "category": "content",
+  "description": "A row of cards with an icon/image, heading, and description. Great for program tiles or feature highlights.",
+  "settings": [
+    { "id": "heading", "type": "text",   "label": "Heading", "default": "Our programs" },
+    { "id": "description", "type": "richtext", "label": "Description" },
+    { "id": "columns", "type": "select", "label": "Columns", "options": ["2", "3", "4"], "default": "3" }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "label": "Card",
+      "settings": [
+        { "id": "icon",      "type": "text",     "label": "Icon (emoji)", "default": "🛟" },
+        { "id": "image_url", "type": "image",    "label": "Image (optional)" },
+        { "id": "heading",   "type": "text",     "label": "Heading", "default": "Program name" },
+        { "id": "body",      "type": "richtext", "label": "Body", "default": "Describe the program here." },
+        { "id": "cta_label", "type": "text",     "label": "Button label" },
+        { "id": "cta_url",   "type": "url",      "label": "Button link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "PNEC Programs (3-up)",
+      "settings": {
+        "heading": "Our programs",
+        "description": "<p>PNEC runs three core programs to keep Poway households prepared for emergencies — pick the one that fits your family.</p>",
+        "columns": "3"
+      },
+      "blocks": [
+        { "type": "card", "settings": { "icon": "🏘", "heading": "Block coordinators", "body": "<p>A trained volunteer on every block who maintains the household roster and helps neighbors connect during an outage.</p>", "cta_label": "Find yours", "cta_url": "/pages/find-your-neighborhood.html" } },
+        { "type": "card", "settings": { "icon": "🎒", "heading": "Emergency kits", "body": "<p>The 72-hour kit checklist — water, food, medications, and the small things you never think of until you need them.</p>", "cta_label": "Build a kit", "cta_url": "/pages/preparedness-resources.html" } },
+        { "type": "card", "settings": { "icon": "📅", "heading": "Drills & training", "body": "<p>Free quarterly drills + the annual Emergency &amp; Safety Fair. Practice now, not when it counts.</p>", "cta_label": "See events", "cta_url": "/pages/community-events-and-activities.html" } }
+      ]
+    },
+    {
+      "name": "Ways to volunteer (2-up)",
+      "settings": {
+        "heading": "Volunteer with PNEC",
+        "description": "<p>PNEC is 100% volunteer-run. Two ways to start.</p>",
+        "columns": "2"
+      },
+      "blocks": [
+        { "type": "card", "settings": { "icon": "🤝", "heading": "Block coordinator", "body": "<p>Spend a few hours a year keeping your block ready. Training and materials provided — no prior experience needed.</p>", "cta_label": "Apply", "cta_url": "/pages/volunteer.html" } },
+        { "type": "card", "settings": { "icon": "🛠", "heading": "Event helper", "body": "<p>Show up the day-of for the Safety Fair, fire drills, or community outreach booths. As much or as little as you want.</p>", "cta_label": "Sign up", "cta_url": "/pages/volunteer.html" } }
+      ]
+    }
+  ]
+}

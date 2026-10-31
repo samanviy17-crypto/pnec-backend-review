@@ -1,0 +1,38 @@
+{
+  "type": "text_block",
+  "label": "Text block",
+  "category": "content",
+  "description": "A simple heading + paragraph block. Useful for announcements and short content.",
+  "settings": [
+    { "id": "heading",       "type": "text",     "label": "Heading",       "default": "Heading" },
+    { "id": "body",          "type": "richtext", "label": "Body",          "default": "Add your content here." },
+    { "id": "text_alignment","type": "select",   "label": "Text alignment",
+      "options": ["left", "center", "right"], "default": "left" }
+  ],
+  "presets": [
+    {
+      "name": "Mission statement",
+      "settings": {
+        "heading": "Why PNEC exists",
+        "body": "<p>When emergency strikes, the first responders are the people on your block — not first responders. That's true everywhere, but especially in Poway, where wildfire risk, Santa Ana winds, and rural roads can put neighborhoods on their own for hours or days.</p><p>PNEC connects every household to a trained block coordinator so when the moment comes, you don't face it alone.</p>",
+        "text_alignment": "left"
+      }
+    },
+    {
+      "name": "Section intro",
+      "settings": {
+        "heading": "How it works",
+        "body": "<p>Three simple steps. Find your block. Meet your coordinator. Build your 72-hour kit. We'll walk you through each.</p>",
+        "text_alignment": "center"
+      }
+    },
+    {
+      "name": "Announcement",
+      "settings": {
+        "heading": "📢 Updated guide available",
+        "body": "<p>The 2025 Poway Wildfire Preparedness Guide is now live with new evacuation routes, updated kit recommendations, and a fresh defensible-space checklist.</p>",
+        "text_alignment": "left"
+      }
+    }
+  ]
+}

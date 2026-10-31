@@ -1,0 +1,32 @@
+{
+  "type": "video_embed",
+  "label": "Video Embed",
+  "category": "media",
+  "description": "Embed a YouTube or Vimeo video. Paste the standard share URL — we extract the embed automatically.",
+  "settings": [
+    { "id": "heading", "type": "text", "label": "Heading" },
+    { "id": "video_url", "type": "url", "label": "Video URL", "default": "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
+    { "id": "caption", "type": "text", "label": "Caption" },
+    { "id": "aspect", "type": "select", "label": "Aspect ratio", "options": ["16/9", "4/3", "1/1"], "default": "16/9" }
+  ],
+  "presets": [
+    {
+      "name": "Wildfire safety basics",
+      "settings": {
+        "heading": "5-minute fire-prep walkthrough",
+        "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "caption": "PNEC's quick guide to defensible space and the go-bag essentials. Replace the URL with your real video.",
+        "aspect": "16/9"
+      }
+    },
+    {
+      "name": "Coordinator training intro",
+      "settings": {
+        "heading": "What block coordinators actually do",
+        "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "caption": "Three current coordinators describe their year — paste your training-session video URL here.",
+        "aspect": "16/9"
+      }
+    }
+  ]
+}
