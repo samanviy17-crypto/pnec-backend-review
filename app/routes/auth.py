@@ -151,7 +151,7 @@ def login():
         return error_response('RATE_LIMITED', 429,
                               {'detail': 'Too many login attempts. Wait a minute and try again.'})
 
-    data = request.get_json(silent=True)
+    data = request.get_json(silent=True) if request.is_json else request.form.to_dict()
     if not isinstance(data, dict) or any(not isinstance(data.get(k, ''), str) for k in ('email', 'password', 'display_name')):
         return error_response('VALIDATION_FAILED', 400)
 

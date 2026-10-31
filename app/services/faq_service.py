@@ -303,6 +303,9 @@ def seed_faq():
         db.session.flush()
 
         for question, answer in cat_data['items']:
+            from flask import current_app
+            contact=current_app.config.get('PUBLIC_CONTACT_EMAIL')
+            if contact:answer=answer.replace('contact@example.test',contact)
             item = FaqItem(
                 category_id=category.id,
                 question=question,

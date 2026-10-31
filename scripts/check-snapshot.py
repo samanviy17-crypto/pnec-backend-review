@@ -9,6 +9,8 @@ pattern = re.compile(rb'(^|[^A-Za-z0-9_])(AIza[0-9A-Za-z_-]{30,}|gh[pousr]_[A-Za
 findings = []
 for path in root.rglob('*'):
     relative = path.relative_to(root).as_posix()
+    if relative == '.git' or relative.startswith('.git/'):
+        continue # The new review checkout metadata is intentionally local; never publish it as source.
     if path.is_symlink():
         findings.append(relative + ': symlink')
         continue

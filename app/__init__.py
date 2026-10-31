@@ -2,7 +2,7 @@
 # Responsibility: Flask application factory — creates and wires together the app instance.
 # All extensions, blueprints, and startup tasks are registered here and nowhere else.
 
-from flask import Flask, jsonify, render_template_string, request
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
@@ -60,8 +60,8 @@ def create_app(initialize_database=None):
         g.pop('_login_user', None)
 
     from app.utils.csrf import APPROVED_ORIGINS, install_csrf_protection
-    app.config['APPROVED_ORIGINS'] = [origin for origin in APPROVED_ORIGINS
-        if config_class is not ProductionConfig or origin.startswith('https://')]
+    if config_class is not ProductionConfig:
+        app.config['APPROVED_ORIGINS'] = APPROVED_ORIGINS
     install_csrf_protection(app)
 
     CORS(
@@ -77,311 +77,8 @@ def create_app(initialize_database=None):
 
     @app.get('/')
     def root_health():
-        """Render a lightweight status page for humans visiting the backend root URL."""
-        port = app.config.get('FLASK_PORT', 8425)
-        return render_template_string(
-            """<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Beasts Flask Backend</title>
-  <style>
-    :root {
-      --bg: #07111f;
-      --panel: rgba(11, 24, 44, 0.92);
-      --panel-2: rgba(16, 34, 61, 0.92);
-      --border: rgba(148, 163, 184, 0.18);
-      --text: #e6eefc;
-      --muted: #94a9c9;
-      --accent: #4cc9f0;
-      --accent-2: #80ed99;
-      --code: #050b14;
-    }
-
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "Segoe UI", system-ui, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top right, rgba(76, 201, 240, 0.16), transparent 30%),
-        radial-gradient(circle at bottom left, rgba(128, 237, 153, 0.12), transparent 28%),
-        linear-gradient(160deg, #050b14 0%, #081524 45%, #0b1d33 100%);
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-
-    .shell {
-      width: min(960px, 100%);
-      display: grid;
-      gap: 18px;
-    }
-
-    .hero,
-    .grid-card,
-    .code-card,
-    .learn-card {
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      background: var(--panel);
-      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.28);
-    }
-
-    .hero {
-      padding: 28px;
-    }
-
-    .kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: rgba(76, 201, 240, 0.12);
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .kicker::before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: var(--accent-2);
-      box-shadow: 0 0 14px rgba(128, 237, 153, 0.8);
-    }
-
-    h1 {
-      margin: 18px 0 10px;
-      font-size: clamp(2rem, 4vw, 3.5rem);
-      line-height: 1;
-    }
-
-    .hero p {
-      margin: 0;
-      max-width: 720px;
-      color: var(--muted);
-      line-height: 1.7;
-      font-size: 1rem;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .grid-card {
-      padding: 20px;
-      background: var(--panel-2);
-    }
-
-    .learn-card {
-      padding: 28px;
-      background:
-        linear-gradient(180deg, rgba(15, 31, 55, 0.96) 0%, rgba(9, 20, 37, 0.96) 100%);
-    }
-
-    .learn-card + .learn-card {
-      margin-top: 0;
-    }
-
-    .grid-card h2 {
-      margin: 0 0 8px;
-      font-size: 1rem;
-    }
-
-    .learn-card h2 {
-      margin: 0 0 8px;
-      font-size: clamp(1.5rem, 2.4vw, 2rem);
-    }
-
-    .learn-card h3 {
-      margin: 0 0 16px;
-      color: var(--accent);
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    .grid-card p,
-    .grid-card li,
-    .code-card p,
-    .learn-card p,
-    .learn-card li {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    .grid-card ul {
-      margin: 0;
-      padding-left: 18px;
-    }
-
-    .learn-card ul {
-      margin: 0;
-      padding-left: 20px;
-      display: grid;
-      gap: 12px;
-    }
-
-    .learn-card strong {
-      color: var(--text);
-    }
-
-    .code-card {
-      overflow: hidden;
-    }
-
-    .code-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(128, 237, 153, 0.12);
-      color: var(--accent-2);
-      font-weight: 700;
-      font-size: 0.92rem;
-    }
-
-    .status::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--accent-2);
-    }
-
-    pre {
-      margin: 0;
-      padding: 20px;
-      background: var(--code);
-      overflow-x: auto;
-      color: #d7e8ff;
-      line-height: 1.7;
-      font-size: 0.95rem;
-    }
-
-    .json-key { color: #7cc7ff; }
-    .json-string { color: #baffc9; }
-
-    .links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      padding: 0 20px 20px;
-    }
-
-    .links a {
-      text-decoration: none;
-      color: var(--text);
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.04);
-      padding: 10px 14px;
-      border-radius: 12px;
-    }
-
-    @media (max-width: 800px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
-</head>
-<body>
-  <main class="shell">
-    <section class="hero">
-      <div class="kicker">Backend Status</div>
-      <h1>Beasts Flask Backend</h1>
-      <p>The backend is online. This page is the human-readable root status page for the Flask server. API consumers should use the JSON endpoint shown below.</p>
-    </section>
-
-    <section class="grid">
-      <article class="grid-card">
-        <h2>Service</h2>
-        <p>Flask application factory initialized successfully.</p>
-      </article>
-      <article class="grid-card">
-        <h2>Port</h2>
-        <p>{{ port }}</p>
-      </article>
-      <article class="grid-card">
-        <h2>Health JSON</h2>
-        <p><code>/api/health</code></p>
-      </article>
-    </section>
-
-    <section class="code-card">
-      <div class="code-head">
-        <strong>Current Status</strong>
-        <span class="status">Running</span>
-      </div>
-      <pre>{
-  <span class="json-key">"message"</span>: <span class="json-string">"Flask backend is running"</span>,
-  <span class="json-key">"status"</span>: <span class="json-string">"ok"</span>,
-  <span class="json-key">"port"</span>: <span class="json-string">"{{ port }}"</span>
-}</pre>
-      <div class="links">
-        <a href="/api/health">Open JSON Health</a>
-        <a href="/api/events">Events API</a>
-        <a href="/api/neighborhoods">Neighborhoods API</a>
-      </div>
-    </section>
-
-    <section class="learn-card">
-      <h2>Python Home Page</h2>
-      <h3>Python Development</h3>
-      <ul>
-        <li><strong>Python 3.12</strong> is used for most backend PBL, while HTML, CSS, and JavaScript support frontend work.</li>
-        <li><strong>Visual Studio Code</strong> is the primary editor and IDE for student developers.</li>
-        <li><strong>GitHub</strong> is used to manage code changes, branches, pull requests, issues, and collaboration flow.</li>
-        <li><strong>DevOps</strong> matters: Git, Linux, Bash, Python packages, and Docker should be part of a backend developer's working toolkit.</li>
-        <li><strong>Flask APIs and microservices</strong> are a core skill, including building and consuming RESTful APIs.</li>
-      </ul>
-    </section>
-
-    <section class="learn-card">
-      <h2>Flask Development</h2>
-      <h3>What is Flask? How do I start web development?</h3>
-      <ul>
-        <li><strong>Flask Framework</strong> is a popular Python web application framework for building lightweight services and web apps.</li>
-        <li><strong>Blueprints</strong> help organize complexity by moving features into independent files and directories.</li>
-        <li><strong>HTML with Bootstrap</strong> is a practical way to build useful pages quickly without writing all CSS from scratch.</li>
-        <li><strong>Jinja2</strong> is Flask's server-side template engine and integrates HTML rendering directly with Python data.</li>
-      </ul>
-    </section>
-
-    <section class="learn-card">
-      <h2>Backend and Persistence</h2>
-      <h3>How do you manage persistent data with Python?</h3>
-      <ul>
-        <li><strong>Databases</strong> provide persistent data storage so applications can keep and retrieve information between runs.</li>
-        <li><strong>SQL</strong> stands for Structured Query Language and remains a long-running standard for accessing and manipulating databases.</li>
-        <li><strong>SQLAlchemy</strong> is the Python SQL toolkit and ORM used to map Python models to relational data.</li>
-        <li><strong>Alternative databases</strong> such as Mongo, DynamoDB, and Neo4J are also relevant and have been used in recent student projects.</li>
-      </ul>
-    </section>
-  </main>
-</body>
-</html>""",
-            port=port,
-        ), 200
+        """PNEC service discovery; no unrelated classroom landing page."""
+        return jsonify({'service':'PNEC API','health':'/api/health','readiness':'/api/ready'})
 
     @app.get('/api/health')
     def api_health():
@@ -457,6 +154,10 @@ def _register_blueprints(app):
     """
     from app.routes.preparedness import preparedness_bp
     app.register_blueprint(preparedness_bp, url_prefix="/api")
+    from app.routes.announcement import announcements_bp
+    app.register_blueprint(announcements_bp, url_prefix='/api')
+    from app.routes.chat import chat_bp
+    app.register_blueprint(chat_bp, url_prefix='/api')
     from app.routes.auth import auth_bp
     from app.routes.legacy_user import legacy_user_bp
     from app.routes.faq import faq_bp

@@ -61,13 +61,15 @@ def health():
 
     # GitHub
     token = current_app.config.get('GITHUB_TOKEN')
-    if not token:
+    if not current_app.config.get('GITHUB_PUBLISH_ENABLED',False):
+        out['github']={'ok':False,'disabled':True,'error':'Repository publishing is disabled for review. No production GitHub write credential is required.'}
+    elif not token:
         out['github'] = {
             'ok': False,
             'error': 'GITHUB_TOKEN env var is not set on the server. '
                      'Without this, publish + load both fail. Generate a '
-                     'fine-grained PAT with Contents:read+write on this repo '
-                     'and set GITHUB_TOKEN in the production environment.',
+                     'fine-grained review-only PAT only after separate owner approval. '
+                     'Do not provide production repository credentials.',
         }
     else:
         try:

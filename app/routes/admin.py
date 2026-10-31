@@ -421,32 +421,36 @@ _ADMIN_OPERATIONS_TEMPLATE = """
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def admin_login_page():
     """Render and process a minimal admin login form for the backend admin UI."""
-    next_url = request.args.get('next') or request.form.get('next') or url_for('admin.admin_accounts_page')
-
-    if current_user.is_authenticated and current_user.role == 'admin':
+    from urllib.parse import urlsplit
+    next_url=request.args.get('next') or request.form.get('next') or url_for('admin.admin_accounts_page')
+    parsed=urlsplit(next_url)
+    if parsed.scheme or parsed.netloc or not parsed.path.startswith('/api/admin/') or next_url.startswith('//'):
+        next_url=url_for('admin.admin_accounts_page')
+    if current_user.is_authenticated and current_user.role=='admin':
         return redirect(next_url)
-
-    error = None
-    if request.method == 'POST':
-      email = (request.form.get('email') or '').strip()
-      password = request.form.get('password') or ''
-
-      user, err = authenticate_user(email, password)
-      if err:
-          error = 'Incorrect email or password.'
-      elif user.role != 'admin':
-          error = 'This page is only available to admin accounts.'
-      else:
-          login_user(user, remember=False)
-          return redirect(next_url)
-
-    return render_template_string(_ADMIN_LOGIN_TEMPLATE, error=error, next_url=next_url)
+    if request.method=='POST':
+        # Reuse the same rate limits, account lockout, token rotation and audit path.
+        from app.routes.auth import login
+        response,status=login()
+        if status!=200:return response,status
+        if current_user.role!='admin':
+            logout_user()
+            return error_response('FORBIDDEN',403)
+        return redirect(next_url)
+    return render_template_string(_ADMIN_LOGIN_TEMPLATE,error=None,next_url=next_url)
 
 
-@admin_bp.route('/logout', methods=['GET'])
+@admin_bp.route('/logout', methods=['GET','POST'])
 def admin_logout_page():
-    """End the current backend admin session and return to the admin login page."""
-    logout_user()
+    """GET only confirms; POST uses the protected, revoking account logout path."""
+    from flask import session
+    import secrets
+    if request.method=='GET':
+        token=session.setdefault('_csrf_token',secrets.token_urlsafe(32))
+        return render_template_string('<form method="post"><input type="hidden" name="_csrf_token" value="{{ token }}"><button>Confirm sign out</button></form>',token=token)
+    from app.routes.auth import logout
+    response,status=logout()
+    if status!=200:return response,status
     return redirect(url_for('admin.admin_login_page'))
 
 
@@ -456,8 +460,7 @@ def admin_accounts_page():
     if not current_user.is_authenticated:
         return redirect(url_for('admin.admin_login_page', next=request.path))
     if current_user.role != 'admin':
-        logout_user()
-        return redirect(url_for('admin.admin_login_page', next=request.path))
+        return error_response('FORBIDDEN',403)
 
     status_filter = (request.args.get('status') or 'all').strip().lower()
     if status_filter not in ('all', 'active', 'inactive'):
@@ -491,8 +494,7 @@ def admin_operations_page():
     if not current_user.is_authenticated:
         return redirect(url_for('admin.admin_login_page', next=request.path))
     if current_user.role != 'admin':
-        logout_user()
-        return redirect(url_for('admin.admin_login_page', next=request.path))
+        return error_response('FORBIDDEN',403)
 
     recommendations = get_operations_snapshot()
     return render_template_string(_ADMIN_OPERATIONS_TEMPLATE, recommendations=recommendations, current_user=current_user)

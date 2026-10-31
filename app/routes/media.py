@@ -34,6 +34,14 @@ def upload_media():
     if not title:
         return error_response('VALIDATION_FAILED', 400, {'detail': 'title is required'})
 
+    if len(title)>200 or len(caption)>4000:
+        return error_response('VALIDATION_FAILED',400)
+    if event_id is not None:
+        from app import db
+        from app.models.event import Event
+        if db.session.get(Event,event_id) is None:
+            return error_response('VALIDATION_FAILED',400)
+
     media_url, err = media_service.save_uploaded_file(file)
     if err:
         return error_response(err, 400)
@@ -68,3 +76,15 @@ def serve_upload(filename):
                                    as_attachment=True, conditional=True)
     response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
+
+
+@media_bp.delete('/media/<int:post_id>')
+@requires_role('admin')
+def delete_media(post_id):
+    """Remove gallery metadata. Retain original media for operator recovery review."""
+    from app import db
+    from app.models.media import MediaPost
+    row=db.session.get(MediaPost,post_id)
+    if not row:return error_response('NOT_FOUND',404)
+    db.session.delete(row);db.session.commit()
+    return jsonify({'message':'Gallery entry deleted; retained files follow operator retention policy.'})

@@ -3,7 +3,7 @@ import click
 from flask import jsonify
 from sqlalchemy import text
 
-REVISION = '0001_pnec_release'
+REVISION = '0002_pnec_features'
 
 
 def register_release_commands(app):
@@ -26,7 +26,8 @@ def register_release_commands(app):
         try:
             db.session.execute(text('SELECT 1'))
             revision = db.session.execute(text('SELECT version_num FROM alembic_version')).scalar()
-            if revision != REVISION:
+            from sqlalchemy import inspect
+            if revision != REVISION or not set(db.metadata.tables).issubset(set(inspect(db.engine).get_table_names())):
                 return jsonify({'status': 'not_ready'}), 503
         except Exception:
             db.session.rollback()

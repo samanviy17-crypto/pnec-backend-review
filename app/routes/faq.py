@@ -22,8 +22,10 @@ _EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]{2,}$')
 
 
 def _q_rate_limited():
-    ip = (request.headers.get('X-Forwarded-For', request.remote_addr or '')
-          .split(',')[0].strip() or '_')
+    ip = request.remote_addr or '_'
+    from app.utils import shared_limits
+    if shared_limits.enabled():
+        return shared_limits.rate_limited('question', ip, _QUESTION_LIMIT, 60)
     now = time.time()
     bucket = [t for t in _qbuckets.get(ip, []) if now - t < 60]
     if len(bucket) >= _QUESTION_LIMIT:
@@ -199,3 +201,22 @@ def feedback_summary():
         FaqFeedback, FaqFeedback.item_id == FaqItem.id).group_by(FaqItem.id).all()
     return jsonify({'feedback': [{'id': item.id, 'question': item.question,
         'votes': total, 'not_helpful': int(negative or 0)} for item, total, negative in rows]})
+
+
+@faq_bp.get('/faq')
+@requires_role('admin', 'staff')
+def admin_faq_list():
+    from app.models.faq import FaqItem
+    return jsonify({'faqs': [row.to_dict() for row in FaqItem.query.order_by(FaqItem.id).all()]})
+
+
+@faq_bp.delete('/faq/<int:item_id>')
+@requires_role('admin')
+def admin_faq_delete(item_id):
+    from app import db
+    from app.models.faq import FaqItem, FaqFeedback
+    row=db.session.get(FaqItem,item_id)
+    if not row:return error_response('NOT_FOUND',404)
+    FaqFeedback.query.filter_by(item_id=item_id).delete(synchronize_session=False)
+    db.session.delete(row);db.session.commit()
+    return jsonify({'message':'FAQ deleted.'})

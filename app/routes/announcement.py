@@ -36,6 +36,12 @@ def get_all_announcements():
 def create_announcement():
     """Create a new sitewide announcement. Admin only."""
     data = request.get_json(silent=True) or {}
+    if not isinstance(data,dict):
+        return error_response('VALIDATION_FAILED',400)
+    if any(not isinstance(data.get(k,''),str) for k in ('message','level')):
+        return error_response('VALIDATION_FAILED',400)
+    if len(data.get('message',''))>4000 or ('is_active' in data and type(data['is_active']) is not bool):
+        return error_response('VALIDATION_FAILED',400)
     message = (data.get('message') or '').strip()
     level   = (data.get('level') or 'info').strip()
 
@@ -48,7 +54,7 @@ def create_announcement():
     if data.get('expires_at'):
         try:
             expires_at = datetime.fromisoformat(data['expires_at'].replace('Z', '+00:00')).replace(tzinfo=None)
-        except ValueError:
+        except (ValueError,TypeError,AttributeError):
             return error_response('VALIDATION_FAILED', 400, {'detail': 'expires_at must be ISO 8601'})
 
     ann = Announcement(
@@ -72,6 +78,12 @@ def update_announcement(ann_id):
         return error_response('NOT_FOUND', 404)
 
     data = request.get_json(silent=True) or {}
+    if not isinstance(data,dict):
+        return error_response('VALIDATION_FAILED',400)
+    if any(k in data and not isinstance(data[k],str) for k in ('message','level')) or len(data.get('message',''))>4000:
+        return error_response('VALIDATION_FAILED',400)
+    if 'is_active' in data and type(data['is_active']) is not bool:
+        return error_response('VALIDATION_FAILED',400)
     if 'message' in data:
         ann.message = (data['message'] or '').strip() or ann.message
     if 'level' in data:
@@ -86,7 +98,7 @@ def update_announcement(ann_id):
         else:
             try:
                 ann.expires_at = datetime.fromisoformat(data['expires_at'].replace('Z', '+00:00')).replace(tzinfo=None)
-            except ValueError:
+            except (ValueError,TypeError,AttributeError):
                 return error_response('VALIDATION_FAILED', 400, {'detail': 'expires_at must be ISO 8601'})
 
     ann.updated_at = datetime.utcnow()

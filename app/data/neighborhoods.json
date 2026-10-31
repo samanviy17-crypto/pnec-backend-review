@@ -1,0 +1,302 @@
+[
+  {
+    "number": 1,
+    "name": "Heritage II \u2014 Northpointe",
+    "zone": "A"
+  },
+  {
+    "number": 2,
+    "name": "Highlands Ranch",
+    "zone": "A"
+  },
+  {
+    "number": 3,
+    "name": "Old Coach",
+    "zone": "A"
+  },
+  {
+    "number": 4,
+    "name": "Lomas Verde",
+    "zone": "B"
+  },
+  {
+    "number": 5,
+    "name": "Vineland Hills",
+    "zone": "B"
+  },
+  {
+    "number": 6,
+    "name": "Stoneridge Country Club",
+    "zone": "A"
+  },
+  {
+    "number": 7,
+    "name": "Old Coach Collection",
+    "zone": "B"
+  },
+  {
+    "number": 8,
+    "name": "Serena",
+    "zone": "B"
+  },
+  {
+    "number": 9,
+    "name": "Summerfield Estates",
+    "zone": "C"
+  },
+  {
+    "number": 10,
+    "name": "Valle Verde",
+    "zone": "C"
+  },
+  {
+    "number": 11,
+    "name": "Silver Saddle",
+    "zone": "C"
+  },
+  {
+    "number": 12,
+    "name": "Green Valley Estates",
+    "zone": "C"
+  },
+  {
+    "number": 13,
+    "name": "Bridlewood Americana",
+    "zone": "C"
+  },
+  {
+    "number": 14,
+    "name": "The Grove",
+    "zone": "C"
+  },
+  {
+    "number": 15,
+    "name": "Stone Canyon",
+    "zone": "B"
+  },
+  {
+    "number": 16,
+    "name": "Green Valley Knolls",
+    "zone": "C"
+  },
+  {
+    "number": 17,
+    "name": "Green Valley Highlands",
+    "zone": "C"
+  },
+  {
+    "number": 18,
+    "name": "Green Valley Summit",
+    "zone": "C"
+  },
+  {
+    "number": 19,
+    "name": "Green Valley Estates South",
+    "zone": "C"
+  },
+  {
+    "number": 20,
+    "name": "Country Squire Estates",
+    "zone": "C"
+  },
+  {
+    "number": 21,
+    "name": "Bridlewood Lakeside",
+    "zone": "C"
+  },
+  {
+    "number": 22,
+    "name": "The Grove (East)",
+    "zone": "C"
+  },
+  {
+    "number": 23,
+    "name": "Hilltop Circle",
+    "zone": "C"
+  },
+  {
+    "number": 24,
+    "name": "La Manda",
+    "zone": "C"
+  },
+  {
+    "number": 25,
+    "name": "West Central Poway",
+    "zone": "D"
+  },
+  {
+    "number": 26,
+    "name": "Williams Ranch",
+    "zone": "B"
+  },
+  {
+    "number": 27,
+    "name": "Del Poniente",
+    "zone": "C"
+  },
+  {
+    "number": 28,
+    "name": "High Valley",
+    "zone": "A"
+  },
+  {
+    "number": 29,
+    "name": "Colony",
+    "zone": "C"
+  },
+  {
+    "number": 30,
+    "name": "Rancho Arbolitos West",
+    "zone": "C"
+  },
+  {
+    "number": 31,
+    "name": "Huntington Gate",
+    "zone": "C"
+  },
+  {
+    "number": 32,
+    "name": "East Central Poway",
+    "zone": "B"
+  },
+  {
+    "number": 33,
+    "name": "Rattlesnake Canyon",
+    "zone": "A"
+  },
+  {
+    "number": 34,
+    "name": "East Poway",
+    "zone": "A"
+  },
+  {
+    "number": 35,
+    "name": "Pomerado Pines",
+    "zone": "C"
+  },
+  {
+    "number": 36,
+    "name": "Poway Valley North",
+    "zone": "C"
+  },
+  {
+    "number": 37,
+    "name": "Palisades",
+    "zone": "C"
+  },
+  {
+    "number": 38,
+    "name": "Rancho Arbolitos East",
+    "zone": "C"
+  },
+  {
+    "number": 39,
+    "name": "Upper Windmill",
+    "zone": "C"
+  },
+  {
+    "number": 40,
+    "name": "Lower Windmill",
+    "zone": "C"
+  },
+  {
+    "number": 41,
+    "name": "Old Poway",
+    "zone": "C"
+  },
+  {
+    "number": 42,
+    "name": "Tierra Bonita",
+    "zone": "C"
+  },
+  {
+    "number": 43,
+    "name": "Sunrise Ranch",
+    "zone": "B"
+  },
+  {
+    "number": 44,
+    "name": "Poway Grade",
+    "zone": "B"
+  },
+  {
+    "number": 45,
+    "name": "Poway Valley South",
+    "zone": "C"
+  },
+  {
+    "number": 46,
+    "name": "Golden City",
+    "zone": "D"
+  },
+  {
+    "number": 47,
+    "name": "Country View",
+    "zone": "C"
+  },
+  {
+    "number": 48,
+    "name": "Poway Portals",
+    "zone": "D"
+  },
+  {
+    "number": 49,
+    "name": "Southwest Poway",
+    "zone": "B"
+  },
+  {
+    "number": 50,
+    "name": "Tustin Hills",
+    "zone": "C"
+  },
+  {
+    "number": 51,
+    "name": "Poway Royal Estates",
+    "zone": "C"
+  },
+  {
+    "number": 52,
+    "name": "Park Creek",
+    "zone": "C"
+  },
+  {
+    "number": 53,
+    "name": "Westgate",
+    "zone": "C"
+  },
+  {
+    "number": 54,
+    "name": "Gate Drive",
+    "zone": "C"
+  },
+  {
+    "number": 55,
+    "name": "Ann-O-Reno Terrace",
+    "zone": "C"
+  },
+  {
+    "number": 56,
+    "name": "Garden Road South",
+    "zone": "A"
+  },
+  {
+    "number": 57,
+    "name": "Garden Road North",
+    "zone": "A"
+  },
+  {
+    "number": 58,
+    "name": "Sycamore Creek",
+    "zone": "A"
+  },
+  {
+    "number": 59,
+    "name": "Rolling Hills Estates",
+    "zone": "B"
+  },
+  {
+    "number": 60,
+    "name": "Creek Rd / Beeler Canyon",
+    "zone": "A"
+  }
+]

@@ -304,68 +304,10 @@ def seed_neighborhoods():
     if Neighborhood.query.first():
         return 0
 
-    seed_data = [
-        {'number': 1,  'name': 'Old Poway Village',           'zone': 'A'},
-        {'number': 2,  'name': 'Poway Road Corridor',         'zone': 'A'},
-        {'number': 3,  'name': 'Twin Peaks Area',             'zone': 'B'},
-        {'number': 4,  'name': 'Community Road',              'zone': 'A'},
-        {'number': 5,  'name': 'Garden Road',                 'zone': 'A'},
-        {'number': 6,  'name': 'Espola Road North',           'zone': 'B'},
-        {'number': 7,  'name': 'Espola Road South',           'zone': 'B'},
-        {'number': 8,  'name': 'Hilleary Park Area',          'zone': 'A'},
-        {'number': 9,  'name': 'Midland Road',                'zone': 'A'},
-        {'number': 10, 'name': 'Scripps Poway Parkway West',  'zone': 'A'},
-        {'number': 11, 'name': 'Scripps Poway Parkway East',  'zone': 'B'},
-        {'number': 12, 'name': 'Stowe Drive Area',            'zone': 'A'},
-        {'number': 13, 'name': 'Martincoit Road',             'zone': 'B'},
-        {'number': 14, 'name': 'Kirkham Road',                'zone': 'B'},
-        {'number': 15, 'name': 'Poway Valley Road',           'zone': 'B'},
-        {'number': 16, 'name': 'Crestridge Road',             'zone': 'C'},
-        {'number': 17, 'name': 'Rattlesnake Creek Area',      'zone': 'C'},
-        {'number': 18, 'name': 'Lake Poway Recreation Area',  'zone': 'C'},
-        {'number': 19, 'name': 'Blue Sky Reserve North',      'zone': 'C'},
-        {'number': 20, 'name': 'Blue Sky Reserve South',      'zone': 'C'},
-        {'number': 21, 'name': 'Poway Industrial Area',       'zone': 'A'},
-        {'number': 22, 'name': 'Creekside Village',           'zone': 'A'},
-        {'number': 23, 'name': 'Oak Knoll Area',              'zone': 'B'},
-        {'number': 24, 'name': 'Summerfield',                 'zone': 'A'},
-        {'number': 25, 'name': 'Tierra Bonita',               'zone': 'B'},
-        {'number': 26, 'name': 'Valley Rim',                  'zone': 'B'},
-        {'number': 27, 'name': 'Heritage Hills',              'zone': 'B'},
-        {'number': 28, 'name': 'Country Manor',               'zone': 'B'},
-        {'number': 29, 'name': 'Los Ranchitos',               'zone': 'C'},
-        {'number': 30, 'name': 'Silverset',                   'zone': 'A'},
-        {'number': 31, 'name': 'Eastview',                    'zone': 'B'},
-        {'number': 32, 'name': 'Alta Vista',                  'zone': 'B'},
-        {'number': 33, 'name': 'Casa Blanca',                 'zone': 'A'},
-        {'number': 34, 'name': 'Valle Verde',                 'zone': 'A'},
-        {'number': 35, 'name': 'Meadowbrook',                 'zone': 'A'},
-        {'number': 36, 'name': 'Morning Star',                'zone': 'B'},
-        {'number': 37, 'name': 'Sun Country Estates',         'zone': 'C'},
-        {'number': 38, 'name': 'Spring Ranch',                'zone': 'C'},
-        {'number': 39, 'name': 'Chaparral Ranch',             'zone': 'C'},
-        {'number': 40, 'name': 'Rocky Road Estates',          'zone': 'C'},
-        {'number': 41, 'name': 'Stonebridge',                 'zone': 'B'},
-        {'number': 42, 'name': 'Poway Town Center',           'zone': 'A'},
-        {'number': 43, 'name': 'South Poway Industrial',      'zone': 'A'},
-        {'number': 44, 'name': 'Windmill Farms',              'zone': 'B'},
-        {'number': 45, 'name': 'Ridgeway',                    'zone': 'B'},
-        {'number': 46, 'name': 'Pintail Landing',             'zone': 'A'},
-        {'number': 47, 'name': 'Budwin Lane Area',            'zone': 'B'},
-        {'number': 48, 'name': 'Sunset Hills',                'zone': 'B'},
-        {'number': 49, 'name': 'Canyon Crest',                'zone': 'C'},
-        {'number': 50, 'name': 'Carriage Hills',              'zone': 'C'},
-        {'number': 51, 'name': 'Brookside',                   'zone': 'A'},
-        {'number': 52, 'name': 'Sycamore Canyon Area',        'zone': 'C'},
-        {'number': 53, 'name': 'Upper Poway Estates',         'zone': 'C'},
-        {'number': 54, 'name': 'El Capitan Estates',          'zone': 'D'},
-        {'number': 55, 'name': 'Donart Drive Area',           'zone': 'B'},
-        {'number': 56, 'name': 'Olive Hills',                 'zone': 'B'},
-        {'number': 57, 'name': 'Poway Park Area',             'zone': 'A'},
-        {'number': 58, 'name': 'Welton Drive Area',           'zone': 'A'},
-        {'number': 59, 'name': 'Cobblestone Creek',           'zone': 'B'},
-        {'number': 60, 'name': 'Hidden Meadows (Poway)',      'zone': 'D'},
-    ]
+    from pathlib import Path
+    # Public number/name/zone metadata only, reconciled with the approved map.
+    # Never infer geographic boundary polygons from image-space hotspot coordinates.
+    seed_data=json.loads((Path(__file__).resolve().parents[1]/'data/neighborhoods.json').read_text())
 
     records = []
     for d in seed_data:
@@ -374,7 +316,7 @@ def seed_neighborhoods():
             name=d['name'],
             zone=d['zone'],
             coordinator_name='[Coordinator TBD]',
-            coordinator_email='contact@example.test',
+            coordinator_email=current_app.config.get('PUBLIC_CONTACT_EMAIL') or None,
         ))
 
     db.session.add_all(records)

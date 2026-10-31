@@ -139,7 +139,7 @@ def _fetch_nws_alerts():
     # NWS requires a User-Agent identifying the app. Be courteous — they
     # rate-limit anonymous traffic.
     headers = {
-        'User-Agent': 'PNEC-HelperBot/3.8 (powaynec.com; contact@example.test)',
+        'User-Agent': f"PNEC-HelperBot/3.8 ({current_app.config.get('PUBLIC_CONTACT_EMAIL') or 'contact-unconfigured'})",
         'Accept': 'application/geo+json',
     }
     try:

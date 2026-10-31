@@ -8,6 +8,7 @@ from flask_login import current_user, login_required
 from app import db
 from app.models.chat import ChatSession, ChatMessage, ChatUserMemory
 from app.utils.errors import error_response
+from app.utils.auth_decorators import requires_role
 
 chat_bp = Blueprint('chat', __name__)
 
@@ -23,7 +24,11 @@ def list_sessions():
 @chat_bp.route('/chat/sessions', methods=['POST'])
 @login_required
 def create_session():
-    data = request.get_json(silent=True) or {}
+    data = request.get_json(silent=True)
+    if data is None:data={}
+    if not isinstance(data,dict):return error_response('VALIDATION_FAILED',400)
+    if not isinstance(data.get('title',''),str) or len(data.get('title',''))>200:
+        return error_response('VALIDATION_FAILED',400)
     session = ChatSession(user_id=current_user.id, title=data.get('title', ''))
     db.session.add(session)
     db.session.commit()
@@ -57,8 +62,14 @@ def add_messages_batch(session_id):
     if not session:
         return error_response('NOT_FOUND', 404)
 
-    data = request.get_json(silent=True) or {}
-    messages_data = data.get('messages', [])[:20]
+    data = request.get_json(silent=True)
+    if data is None:data={}
+    if not isinstance(data,dict):return error_response('VALIDATION_FAILED',400)
+    messages_data = data.get('messages', [])
+    if (not isinstance(messages_data,list) or len(messages_data)>20 or
+            any(not isinstance(m,dict) or m.get('role') not in ('user','assistant') or
+                not isinstance(m.get('content'),str) or len(m['content'])>8000 or m.get('image_url') is not None for m in messages_data)):
+        return error_response('VALIDATION_FAILED',400)
     saved = []
 
     for m in messages_data:
@@ -91,7 +102,10 @@ def get_memory():
 @chat_bp.route('/chat/memory', methods=['PUT'])
 @login_required
 def update_memory():
-    data = request.get_json(silent=True) or {}
+    data = request.get_json(silent=True)
+    if data is None:data={}
+    if not isinstance(data,dict):return error_response('VALIDATION_FAILED',400)
+    if len(json.dumps(data))>32000:return error_response('VALIDATION_FAILED',400)
     memory = ChatUserMemory.query.filter_by(user_id=current_user.id).first()
     if not memory:
         memory = ChatUserMemory(user_id=current_user.id)
@@ -101,3 +115,17 @@ def update_memory():
     memory.set(existing)
     db.session.commit()
     return jsonify(memory.get()), 200
+
+
+@chat_bp.get('/chat/analytics')
+@requires_role('admin')
+def analytics():
+    """Admin-only counts; never return residents' message text or identity."""
+    from sqlalchemy import func
+    total=ChatMessage.query.count()
+    users=ChatMessage.query.filter_by(role='user').count()
+    latest=db.session.query(func.max(ChatMessage.created_at)).scalar()
+    return jsonify({'totalConvos':ChatSession.query.count(),'totalMsgs':total,
+        'userMsgs':users,'botMsgs':total-users,'lastActive':latest.isoformat() if latest else None,
+        'topics':{},'fbUp':0,'fbDown':0,'recentDown':[],'hours':[0]*24,'avgRespChars':0,
+        'limitations':['Browser-only conversations and feedback are not uploaded or included.']})

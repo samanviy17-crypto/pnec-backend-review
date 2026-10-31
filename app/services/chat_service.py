@@ -25,13 +25,19 @@ def generate_chat_response(system_prompt, user_message, history=None, image_data
     if not user_message:
         return None, 'MISSING_MESSAGE'
 
+    if image_data:
+        gemini_key=current_app.config.get('GEMINI_API_KEY')
+        if not gemini_key:
+            return None, {'code':'IMAGE_PROVIDER_NOT_CONFIGURED','detail':'Image understanding requires an approved image provider.'}
+        return _call_gemini(gemini_key, system_prompt, user_message, history, image_data, image_mime_type)
+
     # Try Groq first (14,400 req/day on the free tier, OpenAI-compatible API)
     groq_key = current_app.config.get('GROQ_API_KEY')
     if groq_key:
         text, err = _call_groq(groq_key, system_prompt, user_message, history)
         if text:
             return text, None
-        current_app.logger.warning('Groq failed (%s), falling back to Gemini', err)
+        current_app.logger.warning('Primary chat provider failed; trying configured fallback.')
 
     # Fall back to Gemini
     gemini_key = current_app.config.get('GEMINI_API_KEY')
@@ -98,12 +104,12 @@ def _call_gemini(api_key, system_prompt, user_message, history, image_data=None,
     try:
         response = requests.post(endpoint, params={'key': api_key}, json=payload, timeout=20)
     except requests.RequestException as exc:
-        current_app.logger.warning('Gemini network error: %s', exc)
-        return None, {'code': 'GEMINI_NETWORK_ERROR', 'detail': str(exc)}
+        current_app.logger.warning('Chat provider request failed.')
+        return None, {'code': 'GEMINI_NETWORK_ERROR', 'detail': 'Chat provider network request failed.'}
 
     if response.status_code >= 400:
         detail = _extract_gemini_error(response)
-        current_app.logger.warning('Gemini API error %s: %s', response.status_code, detail)
+        current_app.logger.warning('Chat provider request failed.')
         return None, {'code': 'GEMINI_API_ERROR', 'detail': f'Gemini API returned {response.status_code}: {detail}'}
 
     try:

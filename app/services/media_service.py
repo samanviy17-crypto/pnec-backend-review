@@ -50,6 +50,22 @@ def save_uploaded_file(file_storage):
     if not allowed_file(filename):
         return None, 'VALIDATION_FAILED'
 
+    extension = os.path.splitext(filename)[1].lower()
+    head = file_storage.stream.read(64)
+    file_storage.stream.seek(0)
+    signatures = {
+        '.png': head.startswith(b'\x89PNG\r\n\x1a\n'),
+        '.jpg': head.startswith(b'\xff\xd8\xff'),
+        '.jpeg': head.startswith(b'\xff\xd8\xff'),
+        '.gif': head.startswith((b'GIF87a', b'GIF89a')),
+        '.webp': head.startswith(b'RIFF') and head[8:12] == b'WEBP',
+        '.mp4': head[4:8] == b'ftyp',
+        '.mov': head[4:8] == b'ftyp',
+        '.webm': head.startswith(b'\x1aE\xdf\xa3'),
+    }
+    if not signatures.get(extension, False):
+        return None, 'VALIDATION_FAILED'
+
     upload_folder = current_app.config.get('UPLOAD_FOLDER', 'instance/uploads')
     os.makedirs(upload_folder, exist_ok=True)
 

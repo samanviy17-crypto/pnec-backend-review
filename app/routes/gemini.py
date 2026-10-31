@@ -31,11 +31,20 @@ def proxy_gemini():
     Expected JSON: { prompt: string, text: string }
     """
     data = request.get_json(silent=True) or {}
+    if not isinstance(data, dict):
+        return error_response('VALIDATION_FAILED', 400)
     prompt = data.get('prompt', '')
     user_text = data.get('text') or data.get('message') or data.get('question') or ''
     history = data.get('history') or []
     image_data = data.get('image_data')
     image_mime_type = data.get('image_mime_type', 'image/jpeg')
+
+    if (not isinstance(prompt,str) or len(prompt)>20000 or
+            not isinstance(user_text,str) or len(user_text)>12000 or
+            not isinstance(history,list) or len(history)>50 or
+            (image_data is not None and (not isinstance(image_data,str) or len(image_data)>8*1024*1024)) or
+            image_mime_type not in ('image/jpeg','image/png','image/webp','image/gif')):
+        return error_response('VALIDATION_FAILED',400)
 
     if _is_rate_limited():
         return error_response('RATE_LIMITED', 429, {'detail': 'Too many chatbot requests. Please wait a minute and try again.'})
@@ -46,8 +55,7 @@ def proxy_gemini():
     if err == 'GEMINI_NOT_CONFIGURED':
         return error_response('SERVER_ERROR', 503, {'detail': 'No chat provider configured (set GROQ_API_KEY or GEMINI_API_KEY).'})
     if err:
-        detail = err.get('detail') if isinstance(err, dict) else 'Chat proxy request failed.'
-        return error_response('SERVER_ERROR', 502, {'detail': detail})
+        return error_response('SERVER_ERROR', 502, {'detail': 'Chat provider temporarily unavailable.'})
 
     return jsonify({'text': text}), 200
 
@@ -68,6 +76,10 @@ def _is_rate_limited():
         except Exception:
             pass
 
+    from app.utils import shared_limits
+    if shared_limits.enabled():
+        return shared_limits.rate_limited('chat', _rate_limit_key(), limit, 60)
+
     now = time.time()
     window_start = now - 60
     key = _rate_limit_key()
@@ -83,7 +95,7 @@ def _is_rate_limited():
 
 
 def _rate_limit_key():
-    client_id = request.headers.get('X-Forwarded-For', request.remote_addr or 'anonymous').split(',')[0].strip()
+    client_id = request.remote_addr or 'anonymous'
     return f'gemini-rate-limit:{client_id}'
 
 

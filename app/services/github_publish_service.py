@@ -51,15 +51,14 @@ def _config():
     """Return (token, owner, repo, branch) from app config; raise if
     token is missing — we never want to silently fail-open here."""
     cfg = current_app.config
+    if not cfg.get('GITHUB_PUBLISH_ENABLED', False):
+        raise GitHubPublishError('Repository publishing is disabled.')
     token = cfg.get('GITHUB_TOKEN')
-    if not token:
-        raise GitHubPublishError('GITHUB_TOKEN not configured on the server.')
-    return (
-        token,
-        cfg.get('GITHUB_OWNER') or 'whitelunarium',
-        cfg.get('GITHUB_REPO')  or 'Beasts_FrontEnd',
-        cfg.get('GITHUB_BRANCH') or 'main',
-    )
+    owner, repo, branch = [cfg.get(name, '') for name in ('GITHUB_OWNER', 'GITHUB_REPO', 'GITHUB_BRANCH')]
+    if not token or not owner or not repo or not branch or branch in ('main', 'master'):
+        raise GitHubPublishError('Explicit token, owner, repository and non-production review branch required.')
+    return token, owner, repo, branch
+
 
 
 def _hdrs(token):

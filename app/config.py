@@ -65,6 +65,7 @@ class Config:
     # Now: if ADMIN_PASSWORD is unset OR equals a known-bad sentinel, the
     # _seed_admin_if_missing() boot step refuses to create an admin and
     # logs a loud warning instead.
+    PUBLIC_CONTACT_EMAIL = os.environ.get('PUBLIC_CONTACT_EMAIL') or None
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL') or 'contact@example.test'
     ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')   # NO fallback — see __init__.py:_seed_admin_if_missing
     ADMIN_DISPLAY_NAME = os.environ.get('ADMIN_DISPLAY_NAME') or 'PNEC Admin'
@@ -115,6 +116,7 @@ class Config:
     # GITHUB_TOKEN: a fine-grained PAT with "Contents: read+write" on the
     #               two PNEC repos. NEVER commit this to source — only set
     #               via env var on the production host.
+    GITHUB_PUBLISH_ENABLED = os.environ.get('GITHUB_PUBLISH_ENABLED', 'false').lower() == 'true'
     GITHUB_TOKEN  = os.environ.get('GITHUB_TOKEN') or None
     GITHUB_OWNER  = os.environ.get('GITHUB_OWNER')  or ''
     GITHUB_REPO   = os.environ.get('GITHUB_REPO')   or ''
@@ -167,11 +169,17 @@ def configure_production(config):
         port = parsed.port
     except ValueError:
         raise RuntimeError('Production FRONTEND_URL is invalid.') from None
-    if (parsed.scheme != 'https' or parsed.hostname != 'pnec-review.invalid'
+    approved_frontends = set(os.environ.get('ALLOWED_FRONTEND_ORIGINS', 'https://pnec.opencodingsociety.com,https://pnec-review.invalid').split(','))
+    approved_frontends = {origin.strip().rstrip('/') for origin in approved_frontends if origin.strip()}
+    if (parsed.scheme != 'https' or frontend.rstrip('/') not in approved_frontends
             or parsed.username or parsed.password or port not in (None, 443)
             or parsed.path not in ('', '/') or parsed.query or parsed.fragment):
         raise RuntimeError('Production FRONTEND_URL must be the approved HTTPS PNEC root origin.')
     config['FRONTEND_URL'] = frontend.rstrip('/')
+    config['APPROVED_ORIGINS'] = [config['FRONTEND_URL']]
+    config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER') or config.get('UPLOAD_FOLDER', '')
+    if config['UPLOAD_FOLDER'] and not os.path.isabs(config['UPLOAD_FOLDER']):
+        raise RuntimeError('UPLOAD_FOLDER must be an absolute persistent path.')
     parts = [os.environ.get(name) for name in ('DB_ENDPOINT', 'DB_USERNAME', 'DB_PASSWORD')]
     explicit = os.environ.get('DATABASE_URL')
     if any(parts) and not all(parts):

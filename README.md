@@ -1,47 +1,42 @@
-# PNEC isolated review snapshot
+# PNEC review and deployment-readiness source
 
-This directory contains source only, with no Git history, production secrets,
-user data, deployment workflows or active custom-domain/server configuration.
-Do not publish or deploy without separate approval. See SOURCE-NOTES.md.
-Use loopback-only local previews and synthetic tests; do not point at production.
-The frontend uses reserved .invalid review API fallbacks outside localhost.
-Private service credentials belong outside source control. Safe examples are
-provided; never overwrite an existing environment. Read SECURITY.md before review.
+This private review repository contains only PNEC source and safe examples.
+Read [DEPLOYMENT_HANDOFF.md](DEPLOYMENT_HANDOFF.md) for the manual deployment
+sequence, environment checklist, required operator checks and rollback procedure.
+Read [VALIDATION_REPORT.md](VALIDATION_REPORT.md) for executed checks and limits.
 
-## Validate locally
+No production deployment is authorized. No automatic deployment workflow is
+included. Keep GitHub Actions disabled and GitHub Pages unconfigured during review.
+Never add service credentials, resident data, database files or uploads to Git.
 
-Use a separate Python environment with backend requirements plus frontend
-requirements-dev.txt installed; no environment or dependency directory is bundled.
-From the backend snapshot, run `python -B -m pytest -q -p no:cacheprovider`.
-From any temporary working directory, run:
+## Local validation
+
+Use an isolated virtual environment with backend requirements and frontend
+requirements-dev.txt installed. Tests use synthetic data. From the backend run:
 
 ```sh
-python -B /path/frontend/scripts/run-release-tests.py --frontend-root /path/frontend --backend-root /path/backend
+python -B -m pytest -q -p no:cacheprovider
+python -B scripts/rehearse-deployment.py
 ```
 
-The runner creates disposable build/state outside source. It blocks external APIs;
-its responsive test blocks ALL external requests. Keep the local preview on loopback.
-The frontend also has four offline unit suites: run `npm test` with Node installed.
-No npm dependency installation is required. Ruby dependencies are pinned in the
-frontend Gemfile/Gemfile.lock; `bundle check` validates an installed environment.
-No production workflow, server config, credentials or deployment helper is present.
+From the frontend, run offline Node unit tests with `npm test`, and:
 
-## Known review limitations
+```sh
+python -B scripts/run-release-tests.py --frontend-root /absolute/frontend --backend-root /absolute/backend
+```
 
-The optional preparedness RPG wrapper is included, but two legacy game engines
-are absent upstream and the mansion-game classroom fallback is excluded pending
-PNEC scope approval. See frontend RPG-LIMITATIONS.md and the external validation
-report. Do not claim gameplay completeness from the quiz regression.
-The offline responsive suite retains its desktop negative-margin assertion; it
-fails with 0px because the external WordPress theme is not fetched. Twelve
-viewport width/video bounds checks pass. External-theme visual equivalence and
-live provider/SMTP/production database behavior are NOT certified.
+The runner builds outside source, blocks external APIs and checks all 39 pages at
+mobile/tablet/desktop widths. Dependencies are declared in requirements.txt and
+Gemfile.lock; no dependency installation is bundled. Default builds use reserved
+review origins; the manual production build requires explicit public origins and
+contact email. Core resident workflows do not depend on the deferred RPG. The local
+CSS foundation replaces runtime WordPress theme scripts, styles and Google fonts.
 
-## Publication boundary
+## Scope and deferred features
 
-These are file snapshots with no Git history, not yet GitHub repositories.
-Publishing requires separate approval after the manifest/hash review and GitHub
-App/automation scope confirmation. Do not copy deployment workflows or CNAME into
-a new default branch: an initial push could otherwise run main-triggered jobs.
-Keep future review repositories private, Actions disabled, Pages unconfigured,
-and production credentials/integrations absent. No merge or deployment is approved.
+See RPG-LIMITATIONS.md in the frontend: missing legacy engines are not shipped.
+Newsletter signup and unconfigured payment destinations are safely disabled.
+Chat uses a server proxy; no browser service keys are supported. Live provider,
+SMTP, actual production schema, target Linux and domain/TLS acceptance require an
+operator's approved staging environment. Analytics does not silently upload local
+browser conversations. See SOURCE-NOTES.md, ATTRIBUTION.md and LICENSE for provenance.

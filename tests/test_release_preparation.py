@@ -46,9 +46,9 @@ def test_frozen_migration_matches_release_and_repeats_safely(isolated):
     with db.engine.connect() as connection:
         differences = compare_metadata(MigrationContext.configure(connection), db.metadata)
     assert differences == []
-    assert len(inspect(db.engine).get_table_names()) == 29
+    assert len(inspect(db.engine).get_table_names()) == 33
     upgrade(directory=MIGRATIONS)
-    assert db.session.execute(text('SELECT version_num FROM alembic_version')).scalar() == '0001_pnec_release'
+    assert db.session.execute(text('SELECT version_num FROM alembic_version')).scalar() == '0002_pnec_features'
 
 
 def test_existing_release_adoption_preserves_rows_and_refuses_destructive_downgrade(isolated):
@@ -63,7 +63,7 @@ def test_existing_release_adoption_preserves_rows_and_refuses_destructive_downgr
     assert rejected.value.code == 1
     # Application rollback compatibility: original columns/rows remain queryable.
     assert db.session.execute(text('SELECT name, number, zone FROM neighborhoods')).fetchall() == [('Synthetic', 99, 'A')]
-    assert db.session.execute(text('SELECT version_num FROM alembic_version')).scalar() == '0001_pnec_release'
+    assert db.session.execute(text('SELECT version_num FROM alembic_version')).scalar() == '0002_pnec_features'
 
 
 def test_known_legacy_nullable_profile_upgrade_retains_data(isolated):
@@ -138,16 +138,16 @@ def test_upload_collision_legacy_serving_and_traversal(app, admin_client, monkey
     scoped = patch.__enter__()
     scoped.setattr('app.services.media_service.secrets.token_hex', lambda count: fixed)
     (tmp_path / (fixed + '.png')).write_bytes(b'preserved')
-    response = admin_client.post('/api/media', data={'title': 'Collision', 'file': (io.BytesIO(b'new'), 'same.png')})
+    response = admin_client.post('/api/media', data={'title': 'Collision', 'file': (io.BytesIO(b'\x89PNG\r\n\x1a\nnew'), 'same.png')})
     assert response.status_code != 201
     assert (tmp_path / (fixed + '.png')).read_bytes() == b'preserved'
     patch.__exit__(None, None, None)
-    first = admin_client.post('/api/media', data={'title': 'First', 'file': (io.BytesIO(b'first'), '../../same.png')})
-    second = admin_client.post('/api/media', data={'title': 'Second', 'file': (io.BytesIO(b'second'), 'same.png')})
+    first = admin_client.post('/api/media', data={'title': 'First', 'file': (io.BytesIO(b'\x89PNG\r\n\x1a\nfirst'), '../../same.png')})
+    second = admin_client.post('/api/media', data={'title': 'Second', 'file': (io.BytesIO(b'\x89PNG\r\n\x1a\nsecond'), 'same.png')})
     assert first.status_code == second.status_code == 201
     urls = [r.json['post']['media_url'] for r in (first, second)]
     assert urls[0] != urls[1]
-    for url, content in zip(urls, [b'first', b'second']):
+    for url, content in zip(urls, [b'\x89PNG\r\n\x1a\nfirst', b'\x89PNG\r\n\x1a\nsecond']):
         fetched = app.test_client().get(url)
         assert fetched.status_code == 200 and fetched.data == content
         assert fetched.headers['X-Content-Type-Options'] == 'nosniff'
@@ -168,7 +168,7 @@ def test_uploaded_file_and_database_survive_worker_restart(isolated):
     db.session.commit()
     headers = {'Authorization': 'Bearer ' + token, 'Origin': 'https://pnec-review.invalid'}
     response = isolated.test_client().post('/api/media', headers=headers,
-        data={'title': 'Persisted', 'file': (io.BytesIO(b'persisted-image'), 'test.png')})
+        data={'title': 'Persisted', 'file': (io.BytesIO(b'\x89PNG\r\n\x1a\npersisted-image'), 'test.png')})
     assert response.status_code == 201
     url = response.json['post']['media_url']
     db.session.remove()
@@ -176,7 +176,7 @@ def test_uploaded_file_and_database_survive_worker_restart(isolated):
     restarted = create_app(initialize_database=False)
     restarted.config['TESTING'] = True
     client = restarted.test_client()
-    assert client.get(url).data == b'persisted-image'
+    assert client.get(url).data == b'\x89PNG\r\n\x1a\npersisted-image'
     assert client.get('/api/media').json['posts'][0]['media_url'] == url
     assert client.get('/api/ready').status_code == 200
     with restarted.app_context():
