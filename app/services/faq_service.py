@@ -265,7 +265,7 @@ def seed_faq():
                 ('How do I become a coordinator?',
                  'Contact PNEC at contact@example.test or attend a community preparedness meeting. Coordinators complete a short orientation, learn their neighborhood geography and vulnerable residents, and attend periodic PNEC trainings. No prior emergency experience required.'),
                 ('What does PNEC do?',
-                 'PNEC — Poway Neighborhood Emergency Corps — has been preparing Poway residents since 1995. We organize neighborhoods into emergency zones with trained coordinators, run CERT training, support the PACT ham radio program, host preparedness fairs, and coordinate with the City of Poway and San Diego County OES.'),
+                 'PNEC — Poway Neighborhood Emergency Corps — has been preparing Poway residents since 2011. We organize neighborhoods into emergency zones with trained coordinators, run CERT training, support the PACT ham radio program, host preparedness fairs, and coordinate with the City of Poway and San Diego County OES.'),
             ],
         },
         {

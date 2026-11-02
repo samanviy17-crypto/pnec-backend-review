@@ -31,7 +31,7 @@ DEFAULT_CONFIG = [
     # ── Footer (bottom of every page) ────────────────────────────────────────────
     {'key': 'footer_logo_url',          'label': 'Footer Logo URL',          'description': 'Logo image in the footer',                              'group': 'footer', 'value': ''},
     {'key': 'footer_org_name',          'label': 'Footer Org Name',          'description': 'Organization name in the footer',                       'group': 'footer', 'value': 'Poway Neighborhood Emergency Corps'},
-    {'key': 'footer_tagline',           'label': 'Footer Tagline',           'description': 'Long tagline paragraph in the footer',                  'group': 'footer', 'value': 'Neighbor helping neighbor since 1995. PNEC helps Poway residents prepare, connect, and support one another during emergencies.'},
+    {'key': 'footer_tagline',           'label': 'Footer Tagline',           'description': 'Long tagline paragraph in the footer',                  'group': 'footer', 'value': 'Neighbor helping neighbor since 2011. PNEC helps Poway residents prepare, connect, and support one another during emergencies.'},
     {'key': 'footer_address',           'label': 'Footer Address',           'description': 'Organization address line in the footer',               'group': 'footer', 'value': 'Poway, CA 92064'},
     {'key': 'footer_email',             'label': 'Footer Email',             'description': 'Email address shown in the footer',                     'group': 'footer', 'value': 'contact@example.test'},
     {'key': 'footer_website',           'label': 'Footer Website',           'description': 'Website URL shown in the footer',                       'group': 'footer', 'value': 'powaynec.com'},
