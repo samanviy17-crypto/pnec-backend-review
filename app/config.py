@@ -27,6 +27,9 @@ class Config:
     CSRF_PROTECTION_ENABLED = True
     RATE_LIMIT_STORAGE = 'memory'
     AUTO_INITIALIZE_DATABASE = True
+    # Trusted operator configuration, never derived from editable residence.
+    COORDINATOR_ASSIGNMENTS = {}
+    EVENT_STORAGE_TIMEZONE = None
     SECURITY_STATE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'instance', 'volumes', 'security-limits.json')
 
     # ─── Database ─────────────────────────────────────────────────────────────

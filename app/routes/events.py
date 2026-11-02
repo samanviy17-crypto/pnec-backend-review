@@ -9,8 +9,15 @@ from flask_login import current_user
 from app.services import events_service
 from app.utils.errors import error_response
 from app.utils.auth_decorators import requires_role
+from app.utils.input_validation import json_object, query_integer
+from werkzeug.exceptions import HTTPException
 
 events_bp = Blueprint('events', __name__)
+
+
+@events_bp.errorhandler(HTTPException)
+def controlled_error(error):
+    return jsonify({'message': error.description}), error.code
 
 
 @events_bp.route('/events', methods=['GET'])
@@ -23,13 +30,10 @@ def get_events():
 @events_bp.route('/events/calendar', methods=['GET'])
 def get_calendar_events():
     """Return events for a specific month. Params: ?month=&year="""
-    try:
-        year  = int(request.args.get('year',  datetime.utcnow().year))
-        month = int(request.args.get('month', datetime.utcnow().month))
-    except (ValueError, TypeError):
-        return error_response('VALIDATION_FAILED', 400, {'detail': 'year and month must be integers'})
+    year = query_integer('year', datetime.utcnow().year, 1900, 9998)
+    month = query_integer('month', datetime.utcnow().month, 1, 12)
 
-    events = events_service.get_events_for_month(year, month)
+    events = events_service.get_events_for_month(year, month, request.args.get('timezone', 'America/Los_Angeles'))
     return jsonify({'events': events, 'year': year, 'month': month}), 200
 
 
@@ -37,7 +41,7 @@ def get_calendar_events():
 @requires_role('coordinator', 'staff', 'admin')
 def create_event():
     """Create a new PNEC event. Coordinator+ only."""
-    data = request.get_json(silent=True) or {}
+    data = json_object(events_service.FIELDS)
 
     result, err = events_service.create_event(
         title=data.get('title', ''),
@@ -58,26 +62,17 @@ def update_event(event_id):
     """Update an existing event. Coordinator+ only."""
     from app.models.event import Event
     from app import db
-    from datetime import datetime as dt
 
     event = Event.query.get(event_id)
     if not event:
         return error_response('NOT_FOUND', 404)
 
-    data = request.get_json(silent=True) or {}
-    if 'title' in data:
-        event.title = (data['title'] or '').strip() or event.title
-    if 'description' in data:
-        event.description = data['description']
-    if 'location' in data:
-        event.location = data['location']
-    if 'image_url' in data:
-        event.image_url = data['image_url']
-    if 'date' in data:
-        try:
-            event.date = dt.fromisoformat(data['date'].replace('Z', '+00:00')).replace(tzinfo=None)
-        except (ValueError, AttributeError):
-            return error_response('VALIDATION_FAILED', 400, {'detail': 'date must be ISO 8601'})
+    data = json_object(events_service.FIELDS)
+    values = events_service.validated_fields(data, partial=True)
+    from app.utils.event_time import utc_value
+    utc_value(values.get('date', event.date))
+    for field, value in values.items():
+        setattr(event, field, value)
 
     db.session.commit()
     return jsonify({'message': 'Event updated.', 'event': event.to_dict()}), 200
@@ -93,6 +88,15 @@ def delete_event(event_id):
     event = Event.query.get(event_id)
     if not event:
         return error_response('NOT_FOUND', 404)
+    from app.models.media import MediaPost
+    if MediaPost.query.filter_by(event_id=event.id).first():
+        return error_response('VALIDATION_FAILED', 409, {'detail': 'Event has gallery entries. Retain it or explicitly unlink/reassign entries before deletion.'})
+    from sqlalchemy.exc import IntegrityError
     db.session.delete(event)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except IntegrityError:
+        # A concurrent gallery insertion also restricts deletion atomically.
+        db.session.rollback()
+        return error_response('VALIDATION_FAILED', 409, {'detail': 'Event is referenced by gallery data; retain or explicitly unlink it.'})
     return jsonify({'message': 'Event deleted.'}), 200

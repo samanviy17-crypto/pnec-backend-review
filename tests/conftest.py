@@ -17,6 +17,7 @@ def app(monkeypatch):
     """
     # Patch the URI on the Config class so create_app() picks it up.
     monkeypatch.setattr(Config, 'ADMIN_PASSWORD', 'test-only-admin-password-2026')
+    monkeypatch.setattr(Config, 'EVENT_STORAGE_TIMEZONE', 'UTC')
     original_uri = Config.SQLALCHEMY_DATABASE_URI
     Config.SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     try:

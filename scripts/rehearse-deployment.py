@@ -19,7 +19,7 @@ os.chmod(work,0o700)
 python=Path(sys.executable)
 secret=secrets.token_hex(32);password=secrets.token_urlsafe(32)
 environment={key:os.environ[key] for key in ('PATH','HOME','LANG','TMPDIR','SYSTEMROOT') if key in os.environ}
-environment.update(PATH=str(python.parent)+os.pathsep+environment.get('PATH',''),PYTHONDONTWRITEBYTECODE='1',FLASK_ENV='production',SECRET_KEY=secret,FRONTEND_URL='https://pnec-review.invalid',DATABASE_URL='sqlite:///'+str(work/'application.db'),SECURITY_STATE_PATH=str(work/'limits.json'),UPLOAD_FOLDER=str(work/'uploads'),ADMIN_EMAIL='operator@example.test',ADMIN_PASSWORD=password,MAIL_DELIVERY='disabled',GITHUB_PUBLISH_ENABLED='false')
+environment.update(PATH=str(python.parent)+os.pathsep+environment.get('PATH',''),PYTHONDONTWRITEBYTECODE='1',FLASK_ENV='production',SECRET_KEY=secret,FRONTEND_URL='https://pnec-review.invalid',DATABASE_URL='sqlite:///'+str(work/'application.db'),SECURITY_STATE_PATH=str(work/'limits.json'),UPLOAD_FOLDER=str(work/'uploads'),ADMIN_EMAIL='operator@example.test',ADMIN_PASSWORD=password,MAIL_DELIVERY='disabled',EVENT_STORAGE_TIMEZONE='UTC',GITHUB_PUBLISH_ENABLED='false')
 with (work/'migration.log').open('w') as log:
  for command in ([str(python),'-B','-m','flask','--app','main:app','db','upgrade'],[str(python),'-B','-m','flask','--app','main:app','release-seed','--approved']):
   subprocess.run(command,cwd=root,env=environment,check=True,stdout=log,stderr=subprocess.STDOUT)

@@ -18,6 +18,7 @@ def accounts(app):
                     password_hash='unused-test-hash', neighborhood_id=nid)
         user.generate_token(); db.session.add(user); users[name] = user
     db.session.commit()
+    app.config['COORDINATOR_ASSIGNMENTS'] = {str(u.id): u.neighborhood_id for u in users.values() if u.role == 'coordinator'}
     return users
 
 

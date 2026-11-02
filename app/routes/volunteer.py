@@ -1,6 +1,7 @@
 # app/routes/volunteer.py
 # Volunteer interest submission + admin management endpoints.
 
+import re
 from datetime import datetime
 from flask import Blueprint, jsonify, request, current_app
 from sqlalchemy import desc, or_
@@ -13,12 +14,15 @@ from app.models.volunteer_interest import (
 )
 from app.utils.errors import error_response
 
-try:
-    from app.routes.auth import requires_role
-except Exception:
-    requires_role = None  # gracefully no-op if auth module missing
+from app.utils.input_validation import json_object, text, query_integer
+from werkzeug.exceptions import HTTPException, BadRequest
 
 volunteer_bp = Blueprint('volunteer', __name__)
+
+
+@volunteer_bp.errorhandler(HTTPException)
+def controlled_error(error):
+    return jsonify({'message': error.description}), error.code
 
 
 # ─── Public: submit ───────────────────────────────────────────────
@@ -37,18 +41,18 @@ def submit_interest():
              5xx are caught and turned into a generic 500 (no leak)
     """
     try:
-        data = request.get_json(silent=True) or {}
-        name = (data.get('name') or '').strip()
-        email = (data.get('email') or '').strip().lower()
-        role = (data.get('role') or '').strip()
-        phone = (data.get('phone') or '').strip() or None
-        neighborhood = (data.get('neighborhood') or '').strip() or None
-        message = (data.get('message') or '').strip() or None
+        data = json_object({'name', 'email', 'role', 'phone', 'neighborhood', 'message'})
+        name = text(data.get('name', ''), 'name', 120, required=True)
+        email = text(data.get('email', ''), 'email', 255, required=True).lower()
+        role = text(data.get('role', ''), 'role', 40, required=True)
+        phone = text(data.get('phone'), 'phone', 32, nullable=True) or None
+        neighborhood = text(data.get('neighborhood'), 'neighborhood', 120, nullable=True) or None
+        message = text(data.get('message'), 'message', 5000, nullable=True) or None
 
         # Basic validation
         if len(name) < 2 or len(name) > 120:
             return error_response('INVALID_NAME', 400, {'detail': 'Name is required (2–120 chars).'})
-        if not email or '@' not in email or len(email) > 255:
+        if not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]{2,}', email):
             return error_response('INVALID_EMAIL', 400, {'detail': 'A valid email is required.'})
         if role not in VALID_ROLES:
             return error_response('INVALID_ROLE', 400, {
@@ -81,15 +85,10 @@ def submit_interest():
         db.session.add(vi)
         db.session.commit()
 
-        try:
-            current_app.logger.info(
-                f'volunteer.submit ok id={vi.id} email={email} role={role}'
-            )
-        except Exception:
-            pass
-
         return jsonify({'ok': True, 'id': vi.id}), 200
 
+    except HTTPException:
+        raise
     except Exception:
         try:
             current_app.logger.exception('volunteer.submit_interest failed')
@@ -118,7 +117,9 @@ def list_interests():
     status = (request.args.get('status') or '').strip() or None
     role   = (request.args.get('role') or '').strip() or None
     q      = (request.args.get('q') or '').strip() or None
-    limit  = min(int(request.args.get('limit', 100)), 500)
+    limit = query_integer('limit', 100, 1, 500)
+    if (status and status not in VALID_STATUSES) or (role and role not in VALID_ROLES) or (q and len(q) > 200):
+        raise BadRequest('Invalid status, role or search length.')
 
     query = VolunteerInterest.query
     if status and status in VALID_STATUSES:
@@ -156,9 +157,13 @@ def update_interest(vid):
     if not vi:
         return error_response('NOT_FOUND', 404)
 
-    data = request.get_json(silent=True) or {}
+    data = json_object({'status', 'note'})
+    if not data:
+        raise BadRequest('Provide status or note.')
     status = data.get('status')
-    note = (data.get('note') or '').strip() or None
+    note = text(data.get('note'), 'note', 5000, nullable=True) or None
+    if status is not None and not isinstance(status, str):
+        raise BadRequest('status must be text.')
 
     if status is not None:
         if status not in VALID_STATUSES:

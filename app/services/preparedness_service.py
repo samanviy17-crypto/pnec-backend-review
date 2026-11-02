@@ -1,6 +1,7 @@
 """Shared checklist, assessment and scoped community operations helpers."""
 from datetime import datetime, timezone
 from app import db
+from app.utils.release_policy import coordinator_neighborhood
 from sqlalchemy.exc import IntegrityError
 from app.models.operations import HouseholdPreparedness
 from app.models.neighborhood import Neighborhood
@@ -101,16 +102,16 @@ def scoped(query, model, user):
     if user.role in ('staff', 'admin'):
         return query
     if user.role == 'coordinator':
-        if user.neighborhood_id is None:
+        if coordinator_neighborhood(user) is None:
             return query.filter(False)
-        return query.filter(model.neighborhood_id == user.neighborhood_id)
+        return query.filter(model.neighborhood_id == coordinator_neighborhood(user))
     return query.filter(model.user_id == user.id)
 
 
 def manage_neighborhood(user, neighborhood_id):
     if user.role not in ('coordinator', 'staff', 'admin'):
         raise Forbidden('Coordinator access required.')
-    if user.role == 'coordinator' and (user.neighborhood_id is None or neighborhood_id != user.neighborhood_id):
+    if user.role == 'coordinator' and (coordinator_neighborhood(user) is None or neighborhood_id != coordinator_neighborhood(user)):
         raise Forbidden('You can manage only your assigned neighborhood.')
 
 

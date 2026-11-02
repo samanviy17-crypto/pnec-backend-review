@@ -46,7 +46,14 @@ def create_app(initialize_database=None):
         configure_production(app.config)
 
     # ── Initialize extensions ─────────────────────────────────────────────────
+    from app.utils.release_policy import configure_release_policy
+    configure_release_policy(app)
     db.init_app(app)
+    # Install before the first connection, on every SQLite engine/pool.
+    from app.utils.sqlite_integrity import enforce_foreign_keys
+    with app.app_context():
+        for engine in db.engines.values():
+            enforce_foreign_keys(engine)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     if MAIL_ENABLED:

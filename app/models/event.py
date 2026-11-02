@@ -3,6 +3,7 @@
 
 from datetime import datetime
 from app import db
+from app.utils.event_time import serialize_event_date
 
 
 class Event(db.Model):
@@ -26,7 +27,7 @@ class Event(db.Model):
             'id':          self.id,
             'title':       self.title,
             'description': self.description,
-            'date':        self.date.isoformat(),
+            'date':        serialize_event_date(self.date),
             'location':    self.location,
             'image_url':   self.image_url,
             'created_by':  self.created_by,

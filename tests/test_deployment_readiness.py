@@ -15,7 +15,7 @@ ROOT=Path(__file__).resolve().parents[1]
 def production(monkeypatch,tmp_path):
     for name in ('DB_ENDPOINT','DB_USERNAME','DB_PASSWORD','ALLOWED_FRONTEND_ORIGINS'):
         monkeypatch.delenv(name,raising=False)
-    for name,value in {'FLASK_ENV':'production','SECRET_KEY':secrets.token_hex(32),'FRONTEND_URL':'https://pnec.opencodingsociety.com','DATABASE_URL':'sqlite:///'+str(tmp_path/'test.db'),'SECURITY_STATE_PATH':str(tmp_path/'limits.json'),'UPLOAD_FOLDER':str(tmp_path/'uploads')}.items():
+    for name,value in {'FLASK_ENV':'production','EVENT_STORAGE_TIMEZONE':'UTC','SECRET_KEY':secrets.token_hex(32),'FRONTEND_URL':'https://pnec.opencodingsociety.com','DATABASE_URL':'sqlite:///'+str(tmp_path/'test.db'),'SECURITY_STATE_PATH':str(tmp_path/'limits.json'),'UPLOAD_FOLDER':str(tmp_path/'uploads')}.items():
         monkeypatch.setenv(name,value)
     application=create_app(initialize_database=False)
     with application.app_context():

@@ -65,7 +65,9 @@ class User(UserMixin, db.Model):
 
     def to_dict(self):
         """Return a safe JSON-serializable representation of the user."""
+        from app.utils.release_policy import coordinator_neighborhood
         return {
+            'assigned_neighborhood_id': coordinator_neighborhood(self) if self.role == 'coordinator' else None,
             'id':              self.id,
             'email':           self.email,
             'display_name':    self.display_name,

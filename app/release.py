@@ -7,6 +7,25 @@ REVISION = '0002_pnec_features'
 
 
 def register_release_commands(app):
+    @app.cli.command('release-event-audit')
+    def release_event_audit():
+        """Read-only timestamp interpretation audit; counts only, no personal data."""
+        from app.models.event import Event
+        from app.utils.event_time import storage_zone, utc_value
+        from werkzeug.exceptions import ServiceUnavailable
+        storage_zone()
+        invalid = 0
+        total = 0
+        for row in Event.query.yield_per(500):
+            total += 1
+            try:
+                utc_value(row.date)
+            except ServiceUnavailable:
+                invalid += 1
+        click.echo(f'Events inspected: {total}; ambiguous/nonexistent stored times: {invalid}. No values changed.')
+        if invalid:
+            raise click.ClickException('Owner review required before deployment; do not guess or bulk-convert legacy data.')
+
     @app.cli.command('release-seed')
     @click.option('--approved', is_flag=True, required=True, help='Confirm operator approval and exclusive execution.')
     def release_seed(approved):
@@ -24,6 +43,8 @@ def register_release_commands(app):
         """Read-only database/schema readiness; do not expose connection errors."""
         from app import db
         try:
+            from app.utils.event_time import storage_zone
+            storage_zone()
             db.session.execute(text('SELECT 1'))
             revision = db.session.execute(text('SELECT version_num FROM alembic_version')).scalar()
             from sqlalchemy import inspect

@@ -1,5 +1,14 @@
 # PNEC deployment handoff — operator review required
 
+**November 1 local fix addendum:** the seven-blocker corrections are local,
+uncommitted and unpublished. The former reviewed SHAs are superseded as
+production candidates. Backend `RELEASE_FIX_POLICIES.md` in the paired backend worktree documents the
+proposed policies and operator gates. Owner confirmation of
+coordinator assignments and legacy event timestamp interpretation is mandatory.
+No production schema/data conversion is authorized. Code approval, new immutable
+commits and operator infrastructure checks are still required.
+
+
 Prepared October 30, 2026. **Production NO-GO until the operator gates below are
 satisfied. These are manual future instructions, not authorization to deploy.**
 No production connections, credentials, DNS changes or deployments were used to

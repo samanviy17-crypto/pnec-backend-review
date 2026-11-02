@@ -6,6 +6,7 @@ from flask_login import current_user
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, HTTPException
 from app import db
+from app.utils.release_policy import coordinator_neighborhood
 from app.models.operations import (VolunteerTask, TaskSignup, ResidentCheckIn,
     SupplyDrive, SupplyPledge, HazardReport, WeeklyTip)
 from app.models.user import User
@@ -74,7 +75,7 @@ def task_dict(task):
             'capacity': task.capacity, 'claimed_count': task.claimed_count,
             'closed': task.closed, 'signed_up': bool(mine)}
     if current_user.is_authenticated and current_user.role in ('coordinator', 'staff', 'admin'):
-        if current_user.role != 'coordinator' or current_user.neighborhood_id == task.neighborhood_id:
+        if current_user.role != 'coordinator' or (coordinator_neighborhood(current_user) is not None and coordinator_neighborhood(current_user) == task.neighborhood_id):
             item['volunteers'] = [{'name': u.display_name, 'email': u.email} for u in
                 User.query.join(TaskSignup, TaskSignup.user_id == User.id).filter(TaskSignup.task_id == task.id).all()]
     return item
@@ -310,14 +311,15 @@ def weekly():
     if threat != 'general':
         title = {'fire': 'Wildfire preparedness this week', 'flood': 'Flood preparedness this week', 'heat': 'Heat preparedness this week'}[threat]
         text = 'Review the ' + {'fire': 'wildfire', 'flood': 'flood', 'heat': 'extreme heat'}[threat] + ' preparedness resources and local official alerts. Review your household plan and neighborhood resources.'
-    # Existing event forms store local wall-clock dates without a timezone.
-    now = datetime.now(ZoneInfo('America/Los_Angeles')).replace(tzinfo=None)
-    events = Event.query.filter(Event.date >= now, Event.date < now + timedelta(days=7)).order_by(Event.date).all()
+    from datetime import timezone
+    from app.services.events_service import events_between
+    now = datetime.now(timezone.utc)
+    events = events_between(now, now + timedelta(days=7))
     return jsonify({'week_start': week.isoformat(), 'threat': threat,
         'risk_available': risk is not None, 'risk_is_stale': risk.get('is_stale', False) if risk else None,
         'risk_updated_at': risk.get('updated_at') if risk else None,
         'tips': [{'title': t.title, 'body': t.body, 'threat': t.threat} for t in tips] or [{'title': title, 'body': text, 'threat': threat}],
-        'events': [e.to_dict() for e in events]})
+        'events': events})
 
 
 @preparedness_bp.post('/preparedness/weekly')

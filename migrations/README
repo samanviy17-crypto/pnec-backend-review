@@ -22,3 +22,9 @@ is a separately approved data-recovery operation with potential loss of later
 writes. MySQL and SQLite DDL are not assumed transactional; inspect partial
 failures and rehearse on a sanitized clone. See deploy/RELEASE_RUNBOOK.md and
 DATABASE_RECOVERY.md for prerequisites and operator gates.
+
+November 1 correction to 0002 adoption preflight: compatible SQLite INTEGER /
+MySQL TINYINT Boolean types require 0/1 data; unknown drift still fails before
+feature DDL. No new schema revision or data conversion. Already-applied revisions
+are never rerun or blindly stamped. See RELEASE_FIX_POLICIES.md for mandatory
+legacy event-time interpretation, coordinator assignments and recovery gates.

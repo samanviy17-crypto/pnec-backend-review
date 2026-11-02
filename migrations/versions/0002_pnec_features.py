@@ -107,6 +107,18 @@ EXPECTED = {'announcements': {'columns': {'created_at': {'family': 'DateTime',
                         'indexes': [('ix_chat_user_memories_user_id', ['user_id'], True)]}}
 
 
+def compatible_boolean_type(column_type, dialect):
+    if isinstance(column_type, sa.Boolean):
+        return True
+    if dialect == 'sqlite':
+        return column_type._type_affinity is sa.Integer
+    if dialect == 'mysql':
+        from sqlalchemy.dialects.mysql import TINYINT
+        # MySQL BOOLEAN reflects as TINYINT; width may be omitted by the server.
+        return isinstance(column_type, TINYINT) and column_type.display_width in (None, 1)
+    return False
+
+
 def upgrade():
     inspector=sa.inspect(op.get_bind())
     existing=set(inspector.get_table_names())
@@ -118,11 +130,19 @@ def upgrade():
             raise RuntimeError('Feature schema drift requires review: '+name)
         for key,want in spec['columns'].items():
             got=columns[key]
-            if (got['type']._type_affinity.__name__!=want['family'] or
+            boolean_match = want['family'] == 'Boolean' and compatible_boolean_type(got['type'], op.get_bind().dialect.name)
+            if ((got['type']._type_affinity.__name__!=want['family'] and not boolean_match) or
                 getattr(got['type'],'length',None)!=want['length'] or
                 bool(got['nullable'])!=want['nullable'] or
                 bool(got['primary_key'])!=want['primary_key']):
                 raise RuntimeError('Feature column drift requires review: '+name+'.'+key)
+            if want['family'] == 'Boolean':
+                # Type compatibility never licenses coercion of arbitrary integers.
+                table = sa.table(name, sa.column(key))
+                invalid = op.get_bind().execute(sa.select(sa.func.count()).select_from(table).where(
+                    sa.or_(table.c[key].is_(None), table.c[key].not_in([0, 1])))).scalar()
+                if invalid:
+                    raise RuntimeError('Feature Boolean values require review: '+name+'.'+key)
         actual_indexes={(tuple(sorted(i['column_names'])),bool(i['unique'])) for i in inspector.get_indexes(name)}
         for _,cols,unique in spec['indexes']:
             if (tuple(cols),unique) not in actual_indexes:

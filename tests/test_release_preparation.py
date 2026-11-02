@@ -24,6 +24,7 @@ MIGRATIONS = str(ROOT / 'migrations')
 def isolated(monkeypatch, tmp_path):
     monkeypatch.setattr(Config, 'SQLALCHEMY_DATABASE_URI', 'sqlite:///' + str(tmp_path / 'release.db'))
     monkeypatch.setattr(Config, 'ADMIN_PASSWORD', '')
+    monkeypatch.setattr(Config, 'EVENT_STORAGE_TIMEZONE', 'UTC')
     monkeypatch.setattr(Config, 'UPLOAD_FOLDER', str(tmp_path / 'uploads'))
     application = create_app(initialize_database=False)
     application.config.update(TESTING=True)

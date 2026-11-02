@@ -34,14 +34,16 @@ def get_operations_snapshot():
     )
     volunteer_counts = {neighborhood_id: count for neighborhood_id, count in volunteer_rows}
 
-    coordinator_rows = (
-        db.session.query(User.neighborhood_id, db.func.count(User.id))
-        .filter(User.neighborhood_id.isnot(None), User.is_active.is_(True), User.role.in_(('coordinator', 'staff', 'admin')))
-        .group_by(User.neighborhood_id)
-        .all()
-    )
-    for neighborhood_id, count in coordinator_rows:
-        volunteer_counts[neighborhood_id] = volunteer_counts.get(neighborhood_id, 0) + count
+    from app.utils.release_policy import coordinator_neighborhood
+    for user in User.query.filter(User.is_active.is_(True), User.role == 'coordinator').all():
+        assigned = coordinator_neighborhood(user)
+        if assigned is not None:
+            volunteer_counts[assigned] = volunteer_counts.get(assigned, 0) + 1
+
+    # Staff/admin availability retains its existing residential aggregate semantics.
+    for user in User.query.filter(User.is_active.is_(True), User.role.in_(('staff', 'admin'))).all():
+        if user.neighborhood_id is not None:
+            volunteer_counts[user.neighborhood_id] = volunteer_counts.get(user.neighborhood_id, 0) + 1
 
     resource_rows = (
         db.session.query(ResourceInventory.neighborhood_id, db.func.sum(ResourceInventory.quantity))

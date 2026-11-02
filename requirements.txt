@@ -17,3 +17,6 @@ python-liquid==2.3.6
 
 # Production WSGI server, pinned alongside application dependencies.
 gunicorn==26.2.0
+
+# Decode and canonicalize bounded profile photos; no new storage schema.
+Pillow==13.0.0

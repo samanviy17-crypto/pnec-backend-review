@@ -185,6 +185,12 @@ def update_user_profile(user, data):
             if not 7 <= len(digits) <= 15:
                 return invalid('Enter a phone number with 7–15 digits and an optional + prefix.')
             value = ('+' if value.startswith('+') else '') + digits
+        if field == 'avatar_url' and value:
+            from app.utils.avatar import validate_avatar
+            try:
+                value = validate_avatar(value)
+            except ValueError as error:
+                return invalid(str(error))
         if field == 'bio' and len(value) > 500:
             return invalid('Bio must be 500 characters or fewer.')
         if field in ('phone', 'bio', 'avatar_url'):
