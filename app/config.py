@@ -167,11 +167,20 @@ def configure_production(config):
         port = parsed.port
     except ValueError:
         raise RuntimeError('Production FRONTEND_URL is invalid.') from None
-    if (parsed.scheme != 'https' or parsed.hostname != 'pnec-review.invalid'
+    approved_frontends = {
+        'https://pnec-review.invalid',
+        'https://samanviy17-crypto.github.io/pnec-frontend-review',
+    }
+    if (frontend.rstrip('/') not in approved_frontends
             or parsed.username or parsed.password or port not in (None, 443)
-            or parsed.path not in ('', '/') or parsed.query or parsed.fragment):
+            or parsed.query or parsed.fragment):
         raise RuntimeError('Production FRONTEND_URL must be the approved HTTPS PNEC root origin.')
     config['FRONTEND_URL'] = frontend.rstrip('/')
+    config['APPROVED_ORIGINS'] = [f'{parsed.scheme}://{parsed.netloc}']
+    if parsed.hostname == 'samanviy17-crypto.github.io':
+        # Pages and Render are cross-site; CSRF still checks the exact origin.
+        config['SESSION_COOKIE_SAMESITE'] = 'None'
+        config['REMEMBER_COOKIE_SAMESITE'] = 'None'
     parts = [os.environ.get(name) for name in ('DB_ENDPOINT', 'DB_USERNAME', 'DB_PASSWORD')]
     explicit = os.environ.get('DATABASE_URL')
     if any(parts) and not all(parts):
@@ -203,3 +212,6 @@ def configure_production(config):
     config['SECURITY_STATE_PATH'] = os.environ.get('SECURITY_STATE_PATH') or config['SECURITY_STATE_PATH']
     if not os.path.isabs(config['SECURITY_STATE_PATH']):
         raise RuntimeError('SECURITY_STATE_PATH must be an absolute path on a shared local persistent volume.')
+    config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER') or config.get('UPLOAD_FOLDER', Config.UPLOAD_FOLDER)
+    if not os.path.isabs(config['UPLOAD_FOLDER']):
+        raise RuntimeError('UPLOAD_FOLDER must be an absolute path.')

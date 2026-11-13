@@ -60,8 +60,8 @@ def create_app(initialize_database=None):
         g.pop('_login_user', None)
 
     from app.utils.csrf import APPROVED_ORIGINS, install_csrf_protection
-    app.config['APPROVED_ORIGINS'] = [origin for origin in APPROVED_ORIGINS
-        if config_class is not ProductionConfig or origin.startswith('https://')]
+    if config_class is not ProductionConfig:
+        app.config['APPROVED_ORIGINS'] = list(APPROVED_ORIGINS)
     install_csrf_protection(app)
 
     CORS(
@@ -386,7 +386,12 @@ def create_app(initialize_database=None):
     @app.get('/api/health')
     def api_health():
         """Return a simple machine-readable health payload."""
-        return jsonify({'status': 'ok', 'message': 'Flask backend is running', 'port': app.config.get('FLASK_PORT', 8425)}), 200
+        payload = {'status': 'ok', 'message': 'Flask backend is running', 'port': app.config.get('FLASK_PORT', 8425)}
+        import os
+        if os.environ.get('PNEC_REVIEW_EPHEMERAL') == 'true':
+            payload.update(review=True, ephemeral_storage=True,
+                           revision=os.environ.get('RENDER_GIT_COMMIT', 'local-review'))
+        return jsonify(payload), 200
 
     # ── Bearer token → Flask-Login session bridge ─────────────────────────────
     @app.before_request

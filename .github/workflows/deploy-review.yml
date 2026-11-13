@@ -1,0 +1,52 @@
+name: Deploy Backend Review (Render)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-review-deploy
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install and validate backend
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip check
+          python -B -m pytest -q -p no:cacheprovider
+          python -B scripts/check-review-startup.py
+
+  deploy:
+    needs: validate
+    if: vars.REVIEW_DEPLOY_ENABLED == 'true'
+    environment: review
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Deploy and verify approved review service
+        env:
+          RENDER_REVIEW_DEPLOY_HOOK: ${{ secrets.RENDER_REVIEW_DEPLOY_HOOK }}
+          RENDER_REVIEW_SERVICE_ID: ${{ vars.RENDER_REVIEW_SERVICE_ID }}
+          REVIEW_API_URL: ${{ vars.REVIEW_API_URL }}
+        run: python -B scripts/deploy-review.py

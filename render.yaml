@@ -1,0 +1,27 @@
+# Provision only as a NEW review service after provider approval. No paid resources.
+services:
+  - type: web
+    name: pnec-backend-review
+    runtime: python
+    plan: free
+    repo: https://github.com/samanviy17-crypto/pnec-backend-review
+    branch: main
+    autoDeployTrigger: "off"
+    buildCommand: python -m pip install -r requirements.txt && python -m pip check
+    startCommand: sh scripts/start-review.sh
+    healthCheckPath: /api/ready
+    envVars:
+      - key: PYTHON_VERSION
+        value: '3.12.12'
+      - key: FLASK_ENV
+        value: production
+      - key: PNEC_REVIEW_EPHEMERAL
+        value: 'true'
+      - key: FRONTEND_URL
+        value: https://samanviy17-crypto.github.io/pnec-frontend-review
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_EMAIL
+        value: admin@example.test
