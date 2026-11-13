@@ -33,7 +33,9 @@ jobs:
   deploy:
     needs: validate
     if: vars.REVIEW_DEPLOY_ENABLED == 'true'
-    environment: review
+    environment:
+      name: review
+      url: ${{ vars.REVIEW_API_URL }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

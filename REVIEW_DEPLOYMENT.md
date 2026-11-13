@@ -3,19 +3,22 @@
 This supersedes the snapshot README's old prohibition on review workflows. It
 does not authorize changes to production services, databases, DNS or credentials.
 
-## Configure the NEW review service
+## Existing review service
 
-1. In Render, create a new Blueprint from this repository's `main` branch and
-   inspect `render.yaml`. Confirm service name `pnec-backend-review`, plan **Free**,
-   no disks, no databases and no existing production service selected. Do not
-   upgrade the plan. The first provisioning deploy is performed by Render.
-2. Supply a new, review-only `ADMIN_PASSWORD` (12+ characters) when prompted.
-   Use only `admin@example.test` and synthetic resident accounts. The Blueprint
-   generates an independent `SECRET_KEY`; never copy production values.
+Use only the existing `pnec-backend-review` service, ID
+`srv-dbr8i7d6e07s73at2s1g`, at
+`https://pnec-backend-review.onrender.com`. Do not create another service.
+
+1. In Render, confirm this exact service uses this repository's `main` branch,
+   plan **Free**, no disks and no external database. Compare its configuration
+   with `render.yaml`; do not upgrade the plan or select a production service.
+2. Keep the independent review-only signing key and admin password in Render.
+   Use only `admin@example.test` and synthetic resident accounts; never copy
+   production values or commit credentials.
 3. Keep automatic deployment disabled. The start command is
    `sh scripts/start-review.sh`; health path is `/api/ready`.
-4. Record the actual `https://pnec-backend-review[-suffix].onrender.com` URL and
-   service ID (`srv-...`). Obtain its secret deploy hook from Render Settings.
+4. Obtain the secret deploy hook from this exact service's Render Settings.
+   Copy it directly into GitHub Actions secrets, never into source or logs.
 
 No provider account is configured by these files. The Free service sleeps when
 idle. SQLite, uploads and limiter state are disposable and reset on every start.
@@ -27,8 +30,8 @@ cross-site browser sessions; bearer-authenticated API flows remain available.
 
 In this backend repository, create repository Actions variables:
 
-- `RENDER_REVIEW_SERVICE_ID`: the NEW review service ID.
-- `REVIEW_API_URL`: its actual HTTPS root URL, without a path.
+- `RENDER_REVIEW_SERVICE_ID`: `srv-dbr8i7d6e07s73at2s1g`.
+- `REVIEW_API_URL`: `https://pnec-backend-review.onrender.com`.
 - `REVIEW_DEPLOY_ENABLED`: `true` only after inspecting the destination above.
 
 Create a secret, preferably in GitHub environment `review`:
@@ -37,6 +40,11 @@ Create a secret, preferably in GitHub environment `review`:
 
 Environment `review` may have a required reviewer. The enable variable must be a
 repository variable because it gates job creation before environment loading.
+If it is unset, or differs from the exact string `true`, the deploy job is
+skipped even when validation passes. The deploy job needs successful validation
+and uses environment `review`, retaining any required deployment approval.
+Its environment URL is `REVIEW_API_URL`, which supplies the clickable backend
+link in GitHub Actions; that link alone does not prove deployment succeeded.
 Do not add a GitHub write token, production database or provider keys. Render
 holds the Flask signing/admin secrets; GitHub holds only the review deploy hook.
 
