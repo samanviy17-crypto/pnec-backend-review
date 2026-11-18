@@ -13,6 +13,7 @@ test -z "${DATABASE_URL:-}${DB_ENDPOINT:-}${DB_USERNAME:-}${DB_PASSWORD:-}" || {
 test -z "${GITHUB_TOKEN:-}${GITHUB_OWNER:-}${GITHUB_REPO:-}" || exit 1
 review_state=$(mktemp -d /tmp/pnec-review-XXXXXX)
 export FLASK_ENV=production
+export FLASK_PORT="${PORT:-10000}"
 export DATABASE_URL="sqlite:///$review_state/review.db"
 export SECURITY_STATE_PATH="$review_state/security-limits.json"
 export UPLOAD_FOLDER="$review_state/uploads"
@@ -20,4 +21,4 @@ export MAIL_DELIVERY=disabled
 mkdir -p "$UPLOAD_FOLDER"
 python -m flask --app main:app db upgrade
 python -m flask --app main:app release-seed --approved
-exec gunicorn --bind "0.0.0.0:${PORT:-10000}" --workers 1 --timeout 120 main:app
+exec gunicorn --bind "0.0.0.0:$FLASK_PORT" --workers 1 --timeout 120 main:app

@@ -16,26 +16,27 @@ def persistent_directories(production):
 
 
 def test_migrated_production_state_admitted(production):
-    production.config['FLASK_PORT'] = 8475
+    assert production.config['FLASK_PORT'] == 8630
+    assert production.test_client().get('/api/health').json['port'] == 8630
     assert gate.validate_runtime(production)
 
 
 @pytest.mark.parametrize('key,value', [('DEBUG',True),('AUTO_INITIALIZE_DATABASE',True),('FLASK_PORT',8425),('CSRF_PROTECTION_ENABLED',False),('SESSION_COOKIE_SECURE',False),('SESSION_COOKIE_HTTPONLY',False)])
 def test_unsafe_runtime_refused(production,key,value):
-    production.config['FLASK_PORT'] = 8475
+    production.config['FLASK_PORT'] = 8630
     production.config[key] = value
     assert not gate.validate_runtime(production)
 
 
 def test_missing_persistent_directory_refused(production,tmp_path):
-    production.config.update(FLASK_PORT=8475,UPLOAD_FOLDER=str(tmp_path/'absent'))
+    production.config.update(FLASK_PORT=8630,UPLOAD_FOLDER=str(tmp_path/'absent'))
     assert not gate.validate_runtime(production)
 
 
 def test_missing_sqlite_database_is_not_created(production, tmp_path):
     from app import db
 
-    production.config['FLASK_PORT'] = 8475
+    production.config['FLASK_PORT'] = 8630
     database = tmp_path / 'production-test.db'
     db.engine.dispose()
     database.rename(tmp_path / 'unavailable.db')

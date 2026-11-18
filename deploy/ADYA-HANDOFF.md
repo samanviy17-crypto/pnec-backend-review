@@ -34,7 +34,7 @@ Review logs locally; redact personal data/tokens before sharing. Do not copy
 records into GitHub. Confirm the checkout is the approved PNEC backend, not a
 classroom starter. Record the exact frontend/backend release SHA pair.
 If there is no PNEC service, the proposed unit template is a starting point only;
-choose an unused loopback upstream and dedicated account after approval.
+use the assigned loopback upstream `127.0.0.1:8630` and a dedicated account after approval.
 
 ## 2. Inventory nginx and TLS — no edits until approved
 
@@ -63,7 +63,7 @@ Use `production.env.example` as a list of required names, not a replacement for
 an existing private env file. Preserve approved secrets/credentials; the operator
 supplies missing values privately. Required policy:
 
-- FLASK_ENV=production; exact FRONTEND_URL above; no ephemeral review mode.
+- FLASK_ENV=production; FLASK_PORT=8630; exact FRONTEND_URL above; no ephemeral review mode.
 - Existing strong SECRET_KEY; Secure/HttpOnly host-only cookies, SameSite=Lax
   for the two HTTPS production subdomains. No broad cookie domain is needed.
 - Exact CORS/CSRF frontend origin; credentials enabled; GET/HEAD/POST/PUT/PATCH/

@@ -85,7 +85,7 @@ def create_app(initialize_database=None):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Beasts Flask Backend</title>
+  <title>PNEC Flask Backend</title>
   <style>
     :root {
       --bg: #07111f;
@@ -308,7 +308,7 @@ def create_app(initialize_database=None):
   <main class="shell">
     <section class="hero">
       <div class="kicker">Backend Status</div>
-      <h1>Beasts Flask Backend</h1>
+      <h1>PNEC Flask Backend</h1>
       <p>The backend is online. This page is the human-readable root status page for the Flask server. API consumers should use the JSON endpoint shown below.</p>
     </section>
 

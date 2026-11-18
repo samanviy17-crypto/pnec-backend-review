@@ -1,4 +1,4 @@
-# PROPOSED production definition; no server/project/path/port reservation implied.
+# Proposed production definition. Adya assigned PNEC host port 8630.
 # All required variables must be administrator-confirmed before ANY server action.
 name: "${PNEC_COMPOSE_PROJECT:?Confirm a dedicated PNEC project; never reuse BEASTS}"
 services:
@@ -11,12 +11,12 @@ services:
       - "${PNEC_ENV_FILE:?Set the absolute private production environment file}"
     environment:
       FLASK_ENV: production
-      FLASK_PORT: '8475'
+      FLASK_PORT: '8630'
       FRONTEND_URL: https://powaynec.opencodingsociety.com
       PNEC_REVIEW_EPHEMERAL: 'false'
       PNEC_DOCKER_DISPOSABLE_TEST: 'false'
     ports:
-      - "127.0.0.1:${PNEC_HOST_PORT:?Confirm a formally assigned PNEC host port}:8475"
+      - "127.0.0.1:8630:8630"
     volumes:
       - type: bind
         source: "${PNEC_DATA_DIR:?Set the verified absolute persistent PNEC data directory}"

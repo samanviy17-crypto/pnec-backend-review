@@ -1,7 +1,7 @@
 #!/bin/sh
 # No schema creation, migration, seeding or credential mutation in production startup.
 set -eu
-test "${FLASK_PORT:-8475}" = 8475 || { echo 'Container listener must remain 8475; align Dockerfile/Compose/Gunicorn before changing it.' >&2; exit 1; }
+test "${FLASK_PORT:-8630}" = 8630 || { echo 'Container listener must remain 8630; align Dockerfile/Compose/Gunicorn before changing it.' >&2; exit 1; }
 if [ "${1:-}" = gunicorn ]; then
   case "$*" in
     *scripts.docker_local_app:app*)

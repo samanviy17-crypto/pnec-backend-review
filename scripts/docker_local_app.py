@@ -16,7 +16,7 @@ def create_disposable_app(state_dir='/var/lib/pnec'):
     with database.open('x'):
         pass
     os.environ.update(
-        FLASK_ENV='production', FLASK_PORT='8475',
+        FLASK_ENV='production', FLASK_PORT='8630',
         FRONTEND_URL='https://powaynec.opencodingsociety.com',
         SECRET_KEY=secrets.token_urlsafe(48),
         DATABASE_URL='sqlite:///' + str(database),

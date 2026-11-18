@@ -155,6 +155,7 @@ def get_config():
 
 def configure_production(config):
     """Validate deployment inputs before opening databases. Never log values."""
+    config['FLASK_PORT'] = int(os.environ.get('FLASK_PORT', '8630'))
     secret = os.environ.get('SECRET_KEY', '')
     lowered = secret.lower()
     if (not 32 <= len(secret) <= 512 or len(set(secret)) < 12 or

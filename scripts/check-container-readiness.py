@@ -8,7 +8,7 @@ def validate_runtime(app):
 
     config = app.config
     if (config.get('DEBUG') or config.get('AUTO_INITIALIZE_DATABASE')
-            or config.get('FLASK_PORT') != 8475
+            or config.get('FLASK_PORT') != 8630
             or not config.get('CSRF_PROTECTION_ENABLED')
             or not config.get('SESSION_COOKIE_SECURE')
             or not config.get('SESSION_COOKIE_HTTPONLY')):

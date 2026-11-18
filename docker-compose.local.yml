@@ -8,14 +8,14 @@ services:
       dockerfile: Dockerfile
     environment:
       FLASK_ENV: production
-      FLASK_PORT: '8475'
+      FLASK_PORT: '8630'
       FRONTEND_URL: https://powaynec.opencodingsociety.com
       PNEC_REVIEW_EPHEMERAL: 'false'
       PNEC_DOCKER_DISPOSABLE_TEST: 'true'
       MAIL_DELIVERY: disabled
-    command: [gunicorn, --bind, '0.0.0.0:8475', --workers, '1', --timeout, '120', --access-logfile, '-', --error-logfile, '-', 'scripts.docker_local_app:app']
+    command: [gunicorn, --bind, '0.0.0.0:8630', --workers, '1', --timeout, '120', --access-logfile, '-', --error-logfile, '-', 'scripts.docker_local_app:app']
     ports:
-      - "127.0.0.1:${PNEC_LOCAL_PORT:-8475}:8475"
+      - "127.0.0.1:${PNEC_LOCAL_PORT:-8630}:8630"
     read_only: true
     tmpfs:
       - /tmp:rw,mode=1777

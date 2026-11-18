@@ -39,7 +39,7 @@ with tempfile.TemporaryFile(mode='w+') as log:
             raise RuntimeError('Review startup timed out')
         origin = 'https://samanviy17-crypto.github.io'
         health = requests.get(base + '/api/health', headers={'Origin': origin}, timeout=5)
-        assert health.status_code == 200 and health.json()['status'] == 'ok'
+        assert health.status_code == 200 and health.json()['status'] == 'ok' and health.json()['port'] == port
         assert health.json()['review'] and health.json()['ephemeral_storage']
         assert health.headers['Access-Control-Allow-Origin'] == origin
         rejected = requests.get(base + '/api/health', headers={'Origin': 'https://powaynec.com'}, timeout=5)

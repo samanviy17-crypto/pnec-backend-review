@@ -9,9 +9,9 @@ Read directly: [OCS deployment](https://pages.opencodingsociety.com/flask/deploy
 | Requirement | PNEC preparation |
 |---|---|
 | Dockerfile | Previously absent. Python 3.12 slim, pinned existing requirements, explicit source copies, non-root UID 10001, Gunicorn, readiness healthcheck. Actual base-image/platform compatibility and digest remain unverified until build. |
-| Compose / overrides | Previously absent. New production file requires explicit project/image/env/data/host-port values. Separate standalone local file; never merge it with production. No production override was found. |
-| Port | Container EXPOSE, Gunicorn, healthcheck and config use 8475. Host port requires explicit assignment; no default production host port. Native development default remains 8425. |
-| Startup | `gunicorn --bind 0.0.0.0:8475 --workers 2 main:app`; entrypoint refuses unsafe policy, missing writable state, or unready schema. Never runs production migrations/seeding automatically. |
+| Compose / overrides | Previously absent. New production file requires explicit project/image/env/data values. Separate standalone local file; never merge it with production. No production override was found. |
+| Port | Container EXPOSE, Gunicorn, healthcheck and config use 8630. Adya assigned host port 8630 and Compose binds it only on loopback. Native development default remains 8425. |
+| Startup | `gunicorn --bind 0.0.0.0:8630 --workers 2 main:app`; entrypoint refuses unsafe policy, missing writable state, or unready schema. Never runs production migrations/seeding automatically. |
 | Environment | Preserve existing strong secret, exact FRONTEND_URL, credentialed CORS, CSRF, secure cookies, file rate limits, explicit persistent database and disabled auto-initialization. Existing `production.env.example` supplies variable names, not credentials. |
 | Local verification | Standalone tmpfs database, random synthetic secret, no production env file, providers disabled, explicit disposable bootstrap. Run the foreground container checks before server use. |
 | Repository | Existing feature branch and Draft PR #1 for code review. |
@@ -21,19 +21,19 @@ Read directly: [OCS deployment](https://pages.opencodingsociety.com/flask/deploy
 
 `.dockerignore` allows only required source; no `.env`, databases, instance data, keys, logs or credentials enter the context. requirements.txt is unchanged. `main.py` remains the entry point; its development server is not used in Docker. `scripts/start-review.sh` is ephemeral review-only and must never start production. Migration 0002 is additive; the existing readiness endpoint checks its revision and announcement table. New production startup checks are read-only. Existing systemd instructions are an alternative deployment manager, not a second service to run alongside Compose.
 
-## 1. Inventory and reserve a port before server use
+## 1. Inventory the host and check the assigned port
 
-User-provided Cockpit observations: BEASTS `beasts_backend-web-1`, image `beasts_flask`, project `beasts_backend` uses 8425; Pirates uses 8426. No listener was observed at 8475, but **8475 is NOT reserved**. These observations were not independently checked. No PNEC assignment or reservation registry was found in this repository. Nothing establishes BEASTS ownership by PNEC: leave it untouched.
+Adya assigned port **8630** to PNEC. Check for live listener and project conflicts before startup. BEASTS uses its own Compose project `beasts_backend` and port 8425.
 
-Adya must verify the server's assignment registry and inspect, read-only:
+Check live availability and existing deployments with read-only commands:
 
 ```sh
 docker ps -a --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}'
 docker compose ls
-sudo ss -ltnp
+sudo ss -H -ltnp '( sport = :8630 )'
 ```
 
-Confirm reserved PNEC host port, unique project/image names, persistent data ownership and deployment directory with the server owner. An unused socket alone is insufficient. Recommend a **new dedicated PNEC project**, unless an existing service is positively identified as PNEC and its update separately authorized. `pnec-api` below is the proposed Compose service key, not a confirmed server container. Do not reuse BEASTS project/image names. Never run global Docker cleanup, stop existing containers, or expose Docker inspect environment output.
+Verify assigned port 8630 is free, then confirm the unique project/image names and persistent data ownership with the server owner. Adya directed checkout under the Cockpit account home: `/home/ubuntu/pnec-backend-review`. An unused socket alone is insufficient. Recommend a **new dedicated PNEC project**, unless an existing service is positively identified as PNEC and its update separately authorized. `pnec-api` below is the proposed Compose service key, not a confirmed server container. Do not reuse BEASTS project/image names. Never run global Docker cleanup, stop existing containers, or expose Docker inspect environment output.
 
 ## 2. Local foreground Docker prerequisite — NOT RUN
 
@@ -43,7 +43,7 @@ On a Docker-enabled machine with Compose V2, use this worktree and an unused loc
 cd ~/PNEC-Workspace/pnec-production-backend-20261117
 export PNEC_LOCAL_PROJECT="pnec_local_$(date +%s)"
 export PNEC_LOCAL_TAG="validation-$(git rev-parse --short HEAD)"
-export PNEC_LOCAL_PORT=8475
+export PNEC_LOCAL_PORT=8630
 # Inspect local listeners and docker ps first; choose another LOCAL port if needed.
 docker compose -f docker-compose.local.yml config --quiet
 docker compose -f docker-compose.local.yml build
@@ -85,15 +85,32 @@ Record the foreground Docker checks in Draft PR #1. Obtain explicit server deplo
 
 ## 4. Server clone/build and loopback verification — future authorized work only
 
-Unknown values must be supplied by Adya after verification, not guessed:
+Use the assigned checkout path and have Adya verify the remaining values:
 
-- `PNEC_DEPLOY_DIR`: approved dedicated checkout path; clone this repository there only after publication/approval, or verify existing checkout ownership and cleanliness.
+- `PNEC_DEPLOY_DIR=/home/ubuntu/pnec-backend-review`: dedicated checkout created by cloning from `/home/ubuntu`. If it already exists, verify ownership, origin and cleanliness before proceeding.
 - `PNEC_APPROVED_SHA`: reviewed, published exact commit.
 - `PNEC_COMPOSE_PROJECT`: assigned unique PNEC project.
 - `PNEC_IMAGE`: dedicated PNEC image with reviewed version tag (never `beasts_flask`).
-- `PNEC_HOST_PORT`: formally reserved host port; candidate 8475.
 - `PNEC_ENV_FILE`: absolute private production environment file, outside checkout/build context.
 - `PNEC_DATA_DIR`: existing, verified persistent directory owned/writable by container UID/GID 10001; do not chown someone else's data. Bind creation is disabled.
+
+From the confirmed Cockpit host, clone only into the absent PNEC checkout.
+Set `PNEC_APPROVED_SHA` to the exact revision approved by the release owner first.
+
+```sh
+(
+  set -eu
+  cd /home/ubuntu
+  test ! -e pnec-backend-review && test ! -L pnec-backend-review || exit 1
+  git clone --no-checkout https://github.com/samanviy17-crypto/pnec-backend-review.git
+  cd pnec-backend-review
+  git fetch origin feature/pnec-production-preparation-20261117
+  git merge-base --is-ancestor "${PNEC_APPROVED_SHA:?}" FETCH_HEAD
+  git checkout --detach "$PNEC_APPROVED_SHA"
+  test "$(git rev-parse HEAD)" = "$PNEC_APPROVED_SHA"
+  git status --short --branch
+)
+```
 
 Private environment must retain existing approved credentials, FLASK_ENV=production, FRONTEND_URL=https://powaynec.opencodingsociety.com, a strong SECRET_KEY, explicit DATABASE_URL, SECURITY_STATE_PATH and UPLOAD_FOLDER. For SQLite use a path inside `/var/lib/pnec` (the persistent mount), e.g. an approved `db/pnec.db` under it; precreate its parent plus upload/security directories with private permissions. MySQL requires independently verified connectivity, driver/server compatibility, backups and restored-clone migration rehearsal. Do not generate/rotate production secrets as part of deployment. No seeded production users.
 
@@ -117,8 +134,8 @@ docker compose -f docker-compose.yml run --rm --no-deps --entrypoint python pnec
 # Require 0002_announcements and independently verify retained records.
 docker compose -f docker-compose.yml up -d --build pnec-api
 docker compose -f docker-compose.yml ps
-curl --fail "http://127.0.0.1:$PNEC_HOST_PORT/api/health"
-curl --fail "http://127.0.0.1:$PNEC_HOST_PORT/api/ready"
+curl --fail "http://127.0.0.1:8630/api/health"
+curl --fail "http://127.0.0.1:8630/api/ready"
 ```
 
 Confirm PNEC response identity/revision, not merely HTTP 200; wrong content suggests collision. Startup never repairs a stale database. Capture image ID/digest, approved SHA, project and actual container name after creation. Do not operate on any other Compose project.
@@ -127,7 +144,7 @@ Confirm PNEC response identity/revision, not merely HTTP 200; wrong content sugg
 
 Only after correct server loopback responses: verify the API hostname's existing DNS resolves to the intended server `3.129.109.200`; preserve correct records. No DNS changes are authorized. Do not copy the guide's example classroom hostname/record.
 
-Use `deploy/pnec-api.docker-http.nginx.conf.example` as the **initial HTTP-only** dedicated virtual host. Replace `@RESERVED_HOST_PORT@` with the confirmed port; verify existing virtual hosts first. Actual nginx include path/site enablement requires server verification. Flask remains the sole CORS authority; forward cookies, Origin, Authorization and CSRF normally, with no wildcard CORS or generic OPTIONS interception.
+Use `deploy/pnec-api.docker-http.nginx.conf.example` as the **initial HTTP-only** dedicated virtual host. It proxies to `127.0.0.1:8630`. Verify existing virtual hosts first. Actual nginx include path/site enablement requires server verification. Flask remains the sole CORS authority; forward cookies, Origin, Authorization and CSRF normally, with no wildcard CORS or generic OPTIONS interception.
 
 After explicitly authorized nginx configuration: `sudo nginx -t`, then an approved nginx reload (shared-host adaptation of the guide's restart). Verify HTTP hostname routing before:
 
@@ -148,4 +165,4 @@ Updates use this dedicated project's approved image only, after the same checks.
 
 ## Evidence and remaining gates
 
-See [DOCKER-VALIDATION.md](DOCKER-VALIDATION.md) for native tests and Compose configuration results. Before server deployment, complete the Docker build and runtime checks, nginx validation, TLS/browser testing and database rehearsal. Confirm the server directory, project/image/container identity, persistent storage, existing service ownership and formal port reservation.
+See [DOCKER-VALIDATION.md](DOCKER-VALIDATION.md) for native tests and Compose configuration results. Before server deployment, complete the Docker build and runtime checks, nginx validation, TLS/browser testing and database rehearsal. Confirm the server directory, project/image/container identity, persistent storage, existing service ownership and live availability of port 8630.

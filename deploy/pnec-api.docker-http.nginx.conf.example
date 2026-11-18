@@ -1,14 +1,16 @@
-# Initial HTTP-only template; replace port AFTER reservation. Not installed.
+# Initial HTTP-only template for the assigned PNEC port. Not installed.
 # Verify actual nginx site path and existing virtual hosts before enabling.
 server {
     listen 80;
     server_name powaynec-api.opencodingsociety.com;
+    client_max_body_size 20m;
     location / {
-        proxy_pass http://127.0.0.1:@RESERVED_HOST_PORT@;
+        proxy_pass http://127.0.0.1:8630;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 120s;
         # Flask supplies exact-origin CORS, including OPTIONS and CSRF headers.
     }
 }
