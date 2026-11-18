@@ -1,3 +1,5 @@
+> Docker/Cockpit preparation: follow [OCS-DOCKER-HANDOFF.md](OCS-DOCKER-HANDOFF.md) in guide order. Docker validation is pending. The native systemd procedure below is an alternative; do not run two deployment managers for the same PNEC service.
+
 # Adya/server administrator handoff — prepared only, no production action performed
 
 Target host: **3.129.109.200**. Frontend origin:

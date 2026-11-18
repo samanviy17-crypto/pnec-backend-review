@@ -17,6 +17,7 @@ class Config:
 
     # ─── Security ─────────────────────────────────────────────────────────────
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-prod'
+    FLASK_PORT = int(os.environ.get('FLASK_PORT', '8425'))
     SESSION_COOKIE_NAME = 'pnec_session'
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'

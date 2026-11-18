@@ -1,3 +1,5 @@
+> Snapshot note (2026-11-17): the infrastructure absence described below records the initial audit. Local Docker preparation now exists; follow [OCS-DOCKER-HANDOFF.md](OCS-DOCKER-HANDOFF.md). Container/server validation remains pending and no deployment is authorized.
+
 # Migration and rollback review — NOT a deployment procedure
 
 Production is not authorized. Preserve the reviewed 0001_pnec_release additive

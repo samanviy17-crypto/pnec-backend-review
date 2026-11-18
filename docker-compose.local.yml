@@ -1,0 +1,27 @@
+# Standalone disposable local test; do NOT merge with the production file.
+name: "${PNEC_LOCAL_PROJECT:?Set a unique disposable local project name}"
+services:
+  pnec-api:
+    image: "pnec-backend-local:${PNEC_LOCAL_TAG:?Set a unique local test tag}"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      FLASK_ENV: production
+      FLASK_PORT: '8475'
+      FRONTEND_URL: https://powaynec.opencodingsociety.com
+      PNEC_REVIEW_EPHEMERAL: 'false'
+      PNEC_DOCKER_DISPOSABLE_TEST: 'true'
+      MAIL_DELIVERY: disabled
+    command: [gunicorn, --bind, '0.0.0.0:8475', --workers, '1', --timeout, '120', --access-logfile, '-', --error-logfile, '-', 'scripts.docker_local_app:app']
+    ports:
+      - "127.0.0.1:${PNEC_LOCAL_PORT:-8475}:8475"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,mode=1777
+      - /var/lib/pnec:rw,uid=10001,gid=10001,mode=0700
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    init: true
+    restart: 'no'
+    stop_grace_period: 45s

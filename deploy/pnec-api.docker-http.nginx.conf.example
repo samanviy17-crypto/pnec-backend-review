@@ -1,0 +1,14 @@
+# Initial HTTP-only template; replace port AFTER reservation. Not installed.
+# Verify actual nginx site path and existing virtual hosts before enabling.
+server {
+    listen 80;
+    server_name powaynec-api.opencodingsociety.com;
+    location / {
+        proxy_pass http://127.0.0.1:@RESERVED_HOST_PORT@;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # Flask supplies exact-origin CORS, including OPTIONS and CSRF headers.
+    }
+}
