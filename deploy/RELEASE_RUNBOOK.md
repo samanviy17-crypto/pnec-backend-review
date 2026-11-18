@@ -1,3 +1,5 @@
+> Snapshot note (2026-11-17): the infrastructure absence described below records the initial audit. Local Docker preparation now exists; follow [OCS-DOCKER-HANDOFF.md](OCS-DOCKER-HANDOFF.md). Container/server validation remains pending and no deployment is authorized.
+
 # Migration and rollback review — NOT a deployment procedure
 
 Production is not authorized. Preserve the reviewed 0001_pnec_release additive
@@ -11,3 +13,8 @@ stamp a revision. Destructive downgrade is deliberately refused. Validate a prio
 secure application image against the additive schema; if incompatible, stop and
 obtain a recovery-point/restore plan. No production Compose/nginx/Docker files,
 remote-access helpers or credentials are included in this snapshot.
+
+Current prepared production follow-up: `ADYA-HANDOFF.md` and additive migration
+0002_announcements. Baseline0001 stays frozen; its 28 tables plus announcements
+become 29 application tables. This preparation is local only and does not authorize
+migration, server changes or deployment.

@@ -3,7 +3,7 @@ import click
 from flask import jsonify
 from sqlalchemy import text
 
-REVISION = '0001_pnec_release'
+REVISION = '0002_announcements'
 
 
 def register_release_commands(app):
@@ -28,6 +28,8 @@ def register_release_commands(app):
             revision = db.session.execute(text('SELECT version_num FROM alembic_version')).scalar()
             if revision != REVISION:
                 return jsonify({'status': 'not_ready'}), 503
+            # Reject an incorrectly stamped database missing the new release table.
+            db.session.execute(text('SELECT id FROM announcements LIMIT 0'))
         except Exception:
             db.session.rollback()
             return jsonify({'status': 'not_ready'}), 503

@@ -68,7 +68,7 @@ def create_app(initialize_database=None):
         app,
         supports_credentials=True,
         origins=app.config['APPROVED_ORIGINS'],
-        methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        methods=['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allow_headers=[
             'Authorization', 'Origin', 'X-Origin', 'X-Requested-With',
             'Content-Type', 'Accept', 'X-CSRF-Token',
@@ -85,7 +85,7 @@ def create_app(initialize_database=None):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Beasts Flask Backend</title>
+  <title>PNEC Flask Backend</title>
   <style>
     :root {
       --bg: #07111f;
@@ -308,7 +308,7 @@ def create_app(initialize_database=None):
   <main class="shell">
     <section class="hero">
       <div class="kicker">Backend Status</div>
-      <h1>Beasts Flask Backend</h1>
+      <h1>PNEC Flask Backend</h1>
       <p>The backend is online. This page is the human-readable root status page for the Flask server. API consumers should use the JSON endpoint shown below.</p>
     </section>
 
@@ -462,6 +462,8 @@ def _register_blueprints(app):
     """
     from app.routes.preparedness import preparedness_bp
     app.register_blueprint(preparedness_bp, url_prefix="/api")
+    from app.routes.announcement import announcements_bp
+    app.register_blueprint(announcements_bp, url_prefix="/api")
     from app.routes.auth import auth_bp
     from app.routes.legacy_user import legacy_user_bp
     from app.routes.faq import faq_bp

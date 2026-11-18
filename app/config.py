@@ -17,6 +17,7 @@ class Config:
 
     # ─── Security ─────────────────────────────────────────────────────────────
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-prod'
+    FLASK_PORT = int(os.environ.get('FLASK_PORT', '8425'))
     SESSION_COOKIE_NAME = 'pnec_session'
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
@@ -131,6 +132,8 @@ class ProductionConfig(Config):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     REMEMBER_COOKIE_SECURE = True
+    REMEMBER_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_SAMESITE = 'Lax'
     RATE_LIMIT_STORAGE = 'file'
     AUTO_INITIALIZE_DATABASE = False
 
@@ -152,6 +155,7 @@ def get_config():
 
 def configure_production(config):
     """Validate deployment inputs before opening databases. Never log values."""
+    config['FLASK_PORT'] = int(os.environ.get('FLASK_PORT', '8630'))
     secret = os.environ.get('SECRET_KEY', '')
     lowered = secret.lower()
     if (not 32 <= len(secret) <= 512 or len(set(secret)) < 12 or
@@ -168,6 +172,7 @@ def configure_production(config):
     except ValueError:
         raise RuntimeError('Production FRONTEND_URL is invalid.') from None
     approved_frontends = {
+        'https://powaynec.opencodingsociety.com',
         'https://pnec-review.invalid',
         'https://samanviy17-crypto.github.io/pnec-frontend-review',
     }
@@ -175,6 +180,9 @@ def configure_production(config):
             or parsed.username or parsed.password or port not in (None, 443)
             or parsed.query or parsed.fragment):
         raise RuntimeError('Production FRONTEND_URL must be the approved HTTPS PNEC root origin.')
+    if (frontend.rstrip('/') == 'https://powaynec.opencodingsociety.com'
+            and os.environ.get('PNEC_REVIEW_EPHEMERAL', '').lower() == 'true'):
+        raise RuntimeError('The production frontend cannot use an ephemeral review backend.')
     config['FRONTEND_URL'] = frontend.rstrip('/')
     config['APPROVED_ORIGINS'] = [f'{parsed.scheme}://{parsed.netloc}']
     if parsed.hostname == 'samanviy17-crypto.github.io':

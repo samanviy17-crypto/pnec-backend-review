@@ -1,0 +1,20 @@
+# PROPOSED TEMPLATE ONLY. Replace every @...@ after identifying the actual service.
+# Do not overwrite another application's unit. Never start a second worker blindly.
+[Unit]
+Description=PNEC production API
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+User=@SERVICE_USER@
+Group=@SERVICE_GROUP@
+WorkingDirectory=@DEPLOY_DIRECTORY@
+EnvironmentFile=@PRIVATE_ENV_FILE@
+ExecStart=@VENV_DIRECTORY@/bin/gunicorn --bind 127.0.0.1:8630 --workers 2 --timeout 120 --access-logfile - --error-logfile - main:app
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077
+[Install]
+WantedBy=multi-user.target

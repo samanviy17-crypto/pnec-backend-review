@@ -14,6 +14,7 @@ from sqlalchemy.dialects import mysql
 
 from app import create_app, db
 from app.config import Config
+from app.release import REVISION
 from app.models.user import User
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,9 +47,9 @@ def test_frozen_migration_matches_release_and_repeats_safely(isolated):
     with db.engine.connect() as connection:
         differences = compare_metadata(MigrationContext.configure(connection), db.metadata)
     assert differences == []
-    assert len(inspect(db.engine).get_table_names()) == 29
+    assert len(inspect(db.engine).get_table_names()) == 30
     upgrade(directory=MIGRATIONS)
-    assert db.session.execute(text('SELECT version_num FROM alembic_version')).scalar() == '0001_pnec_release'
+    assert db.session.execute(text('SELECT version_num FROM alembic_version')).scalar() == REVISION
 
 
 def test_existing_release_adoption_preserves_rows_and_refuses_destructive_downgrade(isolated):
@@ -63,7 +64,7 @@ def test_existing_release_adoption_preserves_rows_and_refuses_destructive_downgr
     assert rejected.value.code == 1
     # Application rollback compatibility: original columns/rows remain queryable.
     assert db.session.execute(text('SELECT name, number, zone FROM neighborhoods')).fetchall() == [('Synthetic', 99, 'A')]
-    assert db.session.execute(text('SELECT version_num FROM alembic_version')).scalar() == '0001_pnec_release'
+    assert db.session.execute(text('SELECT version_num FROM alembic_version')).scalar() == REVISION
 
 
 def test_known_legacy_nullable_profile_upgrade_retains_data(isolated):

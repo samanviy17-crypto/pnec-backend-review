@@ -1,0 +1,6 @@
+Entire prepared backend pytest suite, disposable SQLite/in-memory fixtures.
+Command: python -B /tmp/pnec-preparation-pytest.py <isolated-backend-worktree>
+External HTTP providers blocked; no .env copied; no production database/credentials.
+204 passed, 7935 warnings in 31.49s
+Includes existing security/review/backup tests plus production origin/cookies/CORS/CSRF/role and migration preservation/drift cases.
+MySQL DDL compiles; MySQL execution and live-server behavior are not certified.

@@ -1,0 +1,52 @@
+name: Prepare tested OCS image
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    if: >-
+      github.repository == 'samanviy17-crypto/pnec-backend-review' &&
+      ((github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        github.head_ref == 'feature/pnec-production-preparation-20261117') ||
+       (github.event_name == 'workflow_dispatch' &&
+        github.ref == 'refs/heads/feature/pnec-production-preparation-20261117'))
+    name: Build and test linux/${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    env:
+      SOURCE_SHA: af5f3b0e93041999ce760ad3bd51ba18e292b040
+      IMAGE_ARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+          path: reviewed
+          persist-credentials: false
+      - name: Build, test and export the reviewed image
+        run: bash scripts/prepare-ocs-image.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pnec-ocs-${{ env.SOURCE_SHA }}-${{ matrix.arch }}-r${{ github.run_id }}-a${{ github.run_attempt }}
+          path: ${{ runner.temp }}/pnec-image-artifact/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
