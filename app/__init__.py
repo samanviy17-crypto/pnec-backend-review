@@ -68,7 +68,7 @@ def create_app(initialize_database=None):
         app,
         supports_credentials=True,
         origins=app.config['APPROVED_ORIGINS'],
-        methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        methods=['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allow_headers=[
             'Authorization', 'Origin', 'X-Origin', 'X-Requested-With',
             'Content-Type', 'Accept', 'X-CSRF-Token',
@@ -462,6 +462,8 @@ def _register_blueprints(app):
     """
     from app.routes.preparedness import preparedness_bp
     app.register_blueprint(preparedness_bp, url_prefix="/api")
+    from app.routes.announcement import announcements_bp
+    app.register_blueprint(announcements_bp, url_prefix="/api")
     from app.routes.auth import auth_bp
     from app.routes.legacy_user import legacy_user_bp
     from app.routes.faq import faq_bp

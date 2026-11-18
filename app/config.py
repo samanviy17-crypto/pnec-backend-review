@@ -131,6 +131,8 @@ class ProductionConfig(Config):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     REMEMBER_COOKIE_SECURE = True
+    REMEMBER_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_SAMESITE = 'Lax'
     RATE_LIMIT_STORAGE = 'file'
     AUTO_INITIALIZE_DATABASE = False
 
@@ -168,6 +170,7 @@ def configure_production(config):
     except ValueError:
         raise RuntimeError('Production FRONTEND_URL is invalid.') from None
     approved_frontends = {
+        'https://powaynec.opencodingsociety.com',
         'https://pnec-review.invalid',
         'https://samanviy17-crypto.github.io/pnec-frontend-review',
     }
@@ -175,6 +178,9 @@ def configure_production(config):
             or parsed.username or parsed.password or port not in (None, 443)
             or parsed.query or parsed.fragment):
         raise RuntimeError('Production FRONTEND_URL must be the approved HTTPS PNEC root origin.')
+    if (frontend.rstrip('/') == 'https://powaynec.opencodingsociety.com'
+            and os.environ.get('PNEC_REVIEW_EPHEMERAL', '').lower() == 'true'):
+        raise RuntimeError('The production frontend cannot use an ephemeral review backend.')
     config['FRONTEND_URL'] = frontend.rstrip('/')
     config['APPROVED_ORIGINS'] = [f'{parsed.scheme}://{parsed.netloc}']
     if parsed.hostname == 'samanviy17-crypto.github.io':

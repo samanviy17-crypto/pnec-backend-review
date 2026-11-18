@@ -11,3 +11,8 @@ stamp a revision. Destructive downgrade is deliberately refused. Validate a prio
 secure application image against the additive schema; if incompatible, stop and
 obtain a recovery-point/restore plan. No production Compose/nginx/Docker files,
 remote-access helpers or credentials are included in this snapshot.
+
+Current prepared production follow-up: `ADYA-HANDOFF.md` and additive migration
+0002_announcements. Baseline0001 stays frozen; its 28 tables plus announcements
+become 29 application tables. This preparation is local only and does not authorize
+migration, server changes or deployment.
